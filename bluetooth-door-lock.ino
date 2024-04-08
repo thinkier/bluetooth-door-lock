@@ -6,7 +6,7 @@
 #include <Wire.h>
 #include <Adafruit_PWMServoDriver.h>
 
-#define LOCKED  1500
+#define LOCKED  1575
 #define UNLOCKED  2300
 #define SERVO_FREQ 50
 #define SERVO_NUM 0
