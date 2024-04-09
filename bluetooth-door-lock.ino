@@ -41,7 +41,7 @@ void setup()
 
   servo_lock();
   startAdv();
-  delay(1000);
+  delay(500);
   servo_disengage();
 }
 
@@ -91,7 +91,7 @@ void loop()
         write_status();
         break;
       case 'w':
-        delay(1000);
+        delay(500);
         break;
       case 'd':
         servo_disengage();
@@ -132,7 +132,6 @@ void write_status() {
   status += "}";
 
   bleuart.write(status.c_str());
-  delay(50);
 }
 
 // callback invoked when central connects
