@@ -15,6 +15,7 @@
 BLEUart bleuart; // uart over ble
 Adafruit_PWMServoDriver servo = Adafruit_PWMServoDriver();
 bool locked = false;
+bool disengaged = false;
 
 void setup()
 {
@@ -40,6 +41,8 @@ void setup()
 
   servo_lock();
   startAdv();
+  delay(1000);
+  servo_disengage();
 }
 
 void startAdv(void)
@@ -87,6 +90,13 @@ void loop()
         servo_lock();
         write_status();
         break;
+      case 'w':
+        delay(1000);
+        break;
+      case 'd':
+        servo_disengage();
+        write_status();
+        break;
       case '\n':
         break;
       case 'h':
@@ -100,16 +110,25 @@ void loop()
 void servo_lock() {
   servo.writeMicroseconds(SERVO_NUM, LOCKED);
   locked = true;
+  disengaged = false;
 }
 
 void servo_unlock() {
   servo.writeMicroseconds(SERVO_NUM, UNLOCKED);
   locked = false;
+  disengaged = false;
+}
+
+void servo_disengage() {
+  servo.writeMicroseconds(SERVO_NUM, 0);
+  disengaged = true;
 }
 
 void write_status() {
   String status = "{\"locked\": ";
   status += locked ? "true" : "false";
+  status += ", \"disengaged\": ";
+  status += disengaged ? "true" : "false";
   status += "}";
 
   bleuart.write(status.c_str());
