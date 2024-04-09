@@ -19,6 +19,7 @@ bool disengaged = false;
 
 void setup()
 {
+  Serial.begin(115200);
   servo.begin();
   servo.setOscillatorFrequency(27000000);
   servo.setPWMFreq(SERVO_FREQ);
@@ -39,10 +40,8 @@ void setup()
   bleuart.setPermission(SECMODE_ENC_WITH_MITM, SECMODE_ENC_WITH_MITM);
   bleuart.begin();
 
-  servo_lock();
-  startAdv();
-  delay(500);
   servo_disengage();
+  startAdv();
 }
 
 void startAdv(void)
