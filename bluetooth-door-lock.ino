@@ -19,10 +19,10 @@ bool disengaged = false;
 
 void setup()
 {
-  Serial.begin(115200);
   servo.begin();
   servo.setOscillatorFrequency(27000000);
   servo.setPWMFreq(SERVO_FREQ);
+  servo_disengage();
 
   Bluefruit.configPrphBandwidth(BANDWIDTH_MAX);
 
@@ -40,7 +40,6 @@ void setup()
   bleuart.setPermission(SECMODE_ENC_WITH_MITM, SECMODE_ENC_WITH_MITM);
   bleuart.begin();
 
-  servo_disengage();
   startAdv();
 }
 
