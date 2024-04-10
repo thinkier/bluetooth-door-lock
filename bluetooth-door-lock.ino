@@ -13,6 +13,7 @@
 
 // BLE Service
 BLEUart bleuart; // uart over ble
+BLE
 Adafruit_PWMServoDriver servo = Adafruit_PWMServoDriver();
 bool locked = false;
 bool disengaged = false;
@@ -27,7 +28,7 @@ void setup()
   Bluefruit.configPrphBandwidth(BANDWIDTH_MAX);
 
   Bluefruit.begin();
-  Bluefruit.setTxPower(4);    // Check bluefruit.h for supported values
+  Bluefruit.setTxPower(8);    // Check bluefruit.h for supported values
 
   Bluefruit.Security.setIOCaps(true, false, false); // display = true, yes/no = false, keyboard = false
   Bluefruit.Security.setPairPasskeyCallback(pairing_passkey_callback);
