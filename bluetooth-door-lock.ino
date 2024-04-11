@@ -11,15 +11,17 @@
 #define SERVO_FREQ 50
 #define SERVO_NUM 0
 
+#define SERVO_LOCKED_THRESHOLD 410
+
 // BLE Service
 BLEUart bleuart; // uart over ble
-BLE
 Adafruit_PWMServoDriver servo = Adafruit_PWMServoDriver();
 bool locked = false;
 bool disengaged = false;
 
 void setup()
 {
+  pinMode(A0, INPUT);
   servo.begin();
   servo.setOscillatorFrequency(27000000);
   servo.setPWMFreq(SERVO_FREQ);
@@ -75,33 +77,33 @@ void startAdv(void)
 
 void loop()
 {
+  delay(100);
+  locked = analogRead(A0) < 410;
+  write_status();
+
   while ( bleuart.available() )
   {
     switch ((uint8_t) bleuart.read()) {
-      case 's':
-        write_status();
-        break;
       case 'u':
         servo_unlock();
-        write_status();
         break;
       case 'l':
         servo_lock();
-        write_status();
         break;
       case 'w':
         delay(500);
         break;
       case 'd':
         servo_disengage();
-        write_status();
         break;
+      case ' ':
+      case '\r':
       case '\n':
         break;
       case 'h':
       case '?':
       default:
-        bleuart.write("Send <s> for status, <u> to unlock, <l> to lock.");
+        bleuart.write("Send <d> to disengage the servo, <u> to unlock, <l> to lock.");
     }
   }
 }
