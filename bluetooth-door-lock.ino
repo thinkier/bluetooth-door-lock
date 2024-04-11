@@ -75,11 +75,15 @@ void startAdv(void)
   Bluefruit.Advertising.start(0);                // 0 = Don't stop advertising after n seconds  
 }
 
+unsigned long status_time = 0;
+
 void loop()
 {
-  delay(100);
-  locked = analogRead(A0) < 410;
-  write_status();
+  unsigned long now_time = millis();
+  if (now_time < status_time || now_time - status_time > 1000) {
+    locked = analogRead(A0) < 410;
+    write_status();
+  }
 
   while ( bleuart.available() )
   {
