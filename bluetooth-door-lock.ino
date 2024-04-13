@@ -16,12 +16,11 @@
 // BLE Service
 BLEUart bleuart; // uart over ble
 Adafruit_PWMServoDriver servo = Adafruit_PWMServoDriver();
-bool locked = false;
-bool disengaged = false;
 
 void setup()
 {
   pinMode(A0, INPUT);
+  pinMode(A1, INPUT_PULLUP);
   servo.begin();
   servo.setOscillatorFrequency(27000000);
   servo.setPWMFreq(SERVO_FREQ);
@@ -30,7 +29,7 @@ void setup()
   Bluefruit.configPrphBandwidth(BANDWIDTH_MAX);
 
   Bluefruit.begin();
-  Bluefruit.setTxPower(8);    // Check bluefruit.h for supported values
+  Bluefruit.setTxPower(4);    // Check bluefruit.h for supported values
 
   Bluefruit.Security.setIOCaps(true, false, false); // display = true, yes/no = false, keyboard = false
   Bluefruit.Security.setPairPasskeyCallback(pairing_passkey_callback);
@@ -75,13 +74,19 @@ void startAdv(void)
   Bluefruit.Advertising.start(0);                // 0 = Don't stop advertising after n seconds  
 }
 
+bool locked = false;
+bool closed = false;
+bool disengaged = false;
 unsigned long status_time = 0;
 
 void loop()
 {
+  locked = analogRead(A0) < SERVO_LOCKED_THRESHOLD;
+  closed = !digitalRead(A1);
+
   unsigned long now_time = millis();
   if (now_time < status_time || now_time - status_time > 1000) {
-    locked = analogRead(A0) < 410;
+    status_time = now_time;
     write_status();
   }
 
@@ -132,6 +137,8 @@ void servo_disengage() {
 void write_status() {
   String status = "{\"locked\": ";
   status += locked ? "true" : "false";
+  status += ", \"closed\": ";
+  status += closed ? "true" : "false";
   status += ", \"disengaged\": ";
   status += disengaged ? "true" : "false";
   status += "}";
