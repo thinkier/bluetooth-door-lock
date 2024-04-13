@@ -39,7 +39,7 @@ void setup()
   Bluefruit.Periph.setConnectCallback(connect_callback);
   Bluefruit.Periph.setDisconnectCallback(disconnect_callback);
 
-  bleuart.setPermission(SECMODE_ENC_WITH_MITM, SECMODE_ENC_WITH_MITM);
+  bleuart.setPermission(SECMODE_ENC_WITH_LESC_MITM, SECMODE_ENC_WITH_LESC_MITM);
   bleuart.begin();
 
   startAdv();
