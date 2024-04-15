@@ -17,6 +17,9 @@
 BLEUart bleuart; // uart over ble
 Adafruit_PWMServoDriver servo = Adafruit_PWMServoDriver();
 
+const uint8_t bluelockUuid[] = {0x1C, 0xDC, 0x15, 0xE1, 0x36, 0x6D, 0x2C, 0x98, 0x97, 0x75, 0x2F, 0x01, 0x01, 0xE1, 0x8E, 0x01};
+BLEUuid bluelockId = BLEUuid(bluelockUuid);
+
 void setup()
 {
   pinMode(A0, INPUT);
@@ -51,8 +54,7 @@ void startAdv(void)
   Bluefruit.Advertising.addFlags(BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE);
   Bluefruit.Advertising.addTxPower();
 
-  // Include bleuart 128-bit uuid
-  Bluefruit.Advertising.addService(bleuart);
+  Bluefruit.Advertising.addUuid(bluelockId);
 
   // Secondary Scan Response packet (optional)
   // Since there is no room for 'Name' in Advertising packet
