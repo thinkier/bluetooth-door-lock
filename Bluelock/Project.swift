@@ -7,7 +7,7 @@ let project = Project(
             name: "Bluelock",
             destinations: .iOS,
             product: .app,
-            bundleId: "io.tuist.Bluelock",
+            bundleId: "io.github.thinkier.Bluelock",
             infoPlist: .extendingDefault(
                 with: [
                     "UILaunchStoryboardName": "LaunchScreen.storyboard",
@@ -16,16 +16,6 @@ let project = Project(
             sources: ["Bluelock/Sources/**"],
             resources: ["Bluelock/Resources/**"],
             dependencies: []
-        ),
-        .target(
-            name: "BluelockTests",
-            destinations: .iOS,
-            product: .unitTests,
-            bundleId: "io.tuist.BluelockTests",
-            infoPlist: .default,
-            sources: ["Bluelock/Tests/**"],
-            resources: [],
-            dependencies: [.target(name: "Bluelock")]
-        ),
+        )
     ]
 )

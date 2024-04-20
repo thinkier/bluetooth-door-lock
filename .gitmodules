@@ -1,0 +1,4 @@
+[submodule "Bluelock/SQLite.swift"]
+	path = Bluelock/SQLite.swift
+	url = https://github.com/stephencelis/SQLite.swift
+	branch = 0.15.3
