@@ -15,7 +15,7 @@ let project = Project(
             ),
             sources: ["Bluelock/Sources/**"],
             resources: ["Bluelock/Resources/**"],
-            dependencies: []
+            dependencies: [.package(url: "https://github.com/stephencelis/SQLite.swift", from: "0.15.0")]
         )
     ]
 )
