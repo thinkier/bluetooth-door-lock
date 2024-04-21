@@ -13,7 +13,7 @@ let project = Project(
     targets: [
         .target(
             name: "Bluelock iOS",
-            destinations: [.iPhone],
+            destinations: .iOS,
             product: .app,
             productName: "Bluelock",
             bundleId: "io.github.thinkier.Bluelock",
@@ -22,6 +22,7 @@ let project = Project(
                 with: [
                     "UILaunchStoryboardName": "LaunchScreen.storyboard",
                     "NSUserNotificationsUsageDescription": "Recieve alerts when the lock is actuated automatically.",
+                    "NSBluetoothAlwaysUsageDescription": "Connect to Smart Locks.",
                     "UIBackgroundModes": ["bluetooth-central"],
                     "UIFileSharingEnabled": true,
                     "LSSupportsOpeningDocumentsInPlace": true
@@ -34,7 +35,7 @@ let project = Project(
         ),
         .target(
             name: "Bluelock watchOS",
-            destinations: [.appleWatch],
+            destinations: .watchOS,
             product: .app,
             productName: "Bluelock",
             bundleId: "io.github.thinkier.Bluelock.watchos",
@@ -42,9 +43,11 @@ let project = Project(
             infoPlist: .extendingDefault(
                 with: [
                     "NSUserNotificationsUsageDescription": "Recieve alerts when the lock is actuated automatically.",
+                    "NSBluetoothAlwaysUsageDescription": "Connect to Smart Locks.",
                     "WKApplication": true,
                     "WKAppBundleIdentifier": "io.github.thinkier.Bluelock.watchos",
                     "WKCompanionAppBundleIdentifier": "io.github.thinkier.Bluelock",
+                    "WKRunsIndependentlyOfCompanionApp": true,
                     "UIFileSharingEnabled": true,
                     "LSSupportsOpeningDocumentsInPlace": true
                 ]
