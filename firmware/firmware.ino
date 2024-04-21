@@ -13,6 +13,9 @@
 
 #define SERVO_LOCKED_THRESHOLD 410
 
+#define SERVO_FEEDBACK A1
+#define HALL_SENSOR A0
+
 // BLE Service
 BLEUart bleuart; // uart over ble
 Adafruit_PWMServoDriver servo = Adafruit_PWMServoDriver();
@@ -22,8 +25,8 @@ BLEUuid bluelockId = BLEUuid(bluelockUuid);
 
 void setup()
 {
-  pinMode(A0, INPUT);
-  pinMode(A1, INPUT_PULLUP);
+  pinMode(SERVO_FEEDBACK, INPUT);
+  pinMode(HALL_SENSOR, INPUT_PULLUP);
   servo.begin();
   servo.setOscillatorFrequency(27000000);
   servo.setPWMFreq(SERVO_FREQ);
@@ -83,8 +86,8 @@ unsigned long status_time = 0;
 
 void loop()
 {
-  locked = analogRead(A0) < SERVO_LOCKED_THRESHOLD;
-  closed = !digitalRead(A1);
+  locked = analogRead(SERVO_FEEDBACK) < SERVO_LOCKED_THRESHOLD;
+  closed = !digitalRead(HALL_SENSOR);
 
   unsigned long now_time = millis();
   if (now_time < status_time || now_time - status_time > 1000) {
