@@ -12,12 +12,12 @@ let project = Project(
     ),
     targets: [
         .target(
-            name: "Bluelock",
-            destinations: [.iPhone, .appleWatch],
+            name: "Bluelock iOS",
+            destinations: [.iPhone],
             product: .app,
             productName: "Bluelock",
             bundleId: "io.github.thinkier.Bluelock",
-            deploymentTargets: .multiplatform(iOS: "16.0", watchOS: "9.0"),
+            deploymentTargets: .iOS("17.0"),
             infoPlist: .extendingDefault(
                 with: [
                     "UILaunchStoryboardName": "LaunchScreen.storyboard",
@@ -27,10 +27,32 @@ let project = Project(
                     "LSSupportsOpeningDocumentsInPlace": true
                 ]
             ),
-            sources: ["Bluelock/Sources/**"],
-            resources: ["Bluelock/Resources/**"],
+            sources: ["Bluelock/Sources/Common/**", "Bluelock/Sources/iOS/**"],
+            resources: ["Bluelock/Resources/Common/**", "Bluelock/Resources/iOS/**"],
             entitlements: "Bluelock/Bluelock.entitlements",
-            dependencies: []
+            dependencies: [.package(product: "SQLite", type: .runtime)]
+        ),
+        .target(
+            name: "Bluelock watchOS",
+            destinations: [.appleWatch],
+            product: .app,
+            productName: "Bluelock",
+            bundleId: "io.github.thinkier.Bluelock.watchos",
+            deploymentTargets: .watchOS("10.0"),
+            infoPlist: .extendingDefault(
+                with: [
+                    "NSUserNotificationsUsageDescription": "Recieve alerts when the lock is actuated automatically.",
+                    "WKApplication": true,
+                    "WKAppBundleIdentifier": "io.github.thinkier.Bluelock.watchos",
+                    "WKCompanionAppBundleIdentifier": "io.github.thinkier.Bluelock",
+                    "UIFileSharingEnabled": true,
+                    "LSSupportsOpeningDocumentsInPlace": true
+                ]
+            ),
+            sources: ["Bluelock/Sources/Common/**", "Bluelock/Sources/watchOS/**"],
+            resources: ["Bluelock/Resources/Common/**", "Bluelock/Resources/watchOS/**"],
+            entitlements: "Bluelock/Bluelock.entitlements",
+            dependencies: [.package(product: "SQLite", type: .runtime)]
         )
     ]
 )
