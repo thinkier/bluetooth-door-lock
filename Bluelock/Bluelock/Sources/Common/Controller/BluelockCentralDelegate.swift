@@ -39,8 +39,10 @@ public class BluelockCentralDelegate: NSObject, CBCentralManagerDelegate, Observ
     public func getPeripheralDelegate(_ peripheral: CBPeripheral) -> BluelockPeripheralDelegate {
         if peripherals[peripheral.identifier] == nil {
             let lock = getScannedPeripheral(peripheral.identifier)
-                .map { BluelockPeripheralDelegate(peripheral: peripheral, rssi: $0.rssi, txPower: $0.txPowerLevel) }
-            ?? BluelockPeripheralDelegate(peripheral: peripheral, rssi: -128, txPower: 8)
+                .map {
+                    BluelockPeripheralDelegate(peripheral: peripheral, rssi: $0.rssi, txPower: $0.txPowerLevel)
+                }
+            ?? BluelockPeripheralDelegate(peripheral: peripheral, rssi: -128, txPower: 4)
             peripherals.updateValue(lock, forKey: peripheral.identifier)
         }
         
@@ -135,7 +137,8 @@ public class BluelockCentralDelegate: NSObject, CBCentralManagerDelegate, Observ
         let dist = estimateDistance(rssi: rssi.floatValue, txPower: txPower)
         
         if BluelockDb.main.retrieve(peripheral: peripheral) != nil {
-            let _ = getPeripheralDelegate(peripheral)
+            let delegate = getPeripheralDelegate(peripheral)
+            delegate.txPower = txPower
         }
         
         if dist < 10000 {
@@ -180,6 +183,6 @@ public class BluelockCentralDelegate: NSObject, CBCentralManagerDelegate, Observ
 /// Returns the best-guess open-air distance in metres
 ///
 /// https://stackoverflow.com/a/27550658
-public func estimateDistance(rssi: Float, txPower: Float = 4) -> Float {
+public func estimateDistance(rssi: Float, txPower: Float = 0) -> Float {
     return (pow(10, (txPower - rssi) / (10 * 2)) / 1e2).rounded() / 1e1
 }

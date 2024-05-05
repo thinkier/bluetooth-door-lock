@@ -42,6 +42,13 @@ struct DeviceDiagnosticView: View {
                         .foregroundStyle(Color.secondary)
                 }
                 HStack {
+                    Label("Transmit Power", systemImage: "bolt.fill")
+                        .symbolRenderingMode(.hierarchical)
+                    Spacer()
+                    Text(Int(scanned?.txPowerLevel ?? currentLock.txPower).description + "dBm")
+                        .foregroundStyle(Color.secondary)
+                }
+                HStack {
                     Label("Distance Estimate", systemImage: "ruler")
                         .symbolRenderingMode(.hierarchical)
                     Spacer()
