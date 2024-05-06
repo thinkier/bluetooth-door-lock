@@ -35,7 +35,7 @@ void setup()
   Bluefruit.configPrphBandwidth(BANDWIDTH_MAX);
 
   Bluefruit.begin();
-  Bluefruit.setTxPower(-20);    // Check bluefruit.h for supported values
+  Bluefruit.setTxPower(-12);    // Check bluefruit.h for supported values
 
   Bluefruit.Security.setIOCaps(true, false, false); // display = true, yes/no = false, keyboard = false
   Bluefruit.Security.setPairPasskeyCallback(pairing_passkey_callback);
@@ -83,11 +83,18 @@ bool locked = false;
 bool closed = false;
 bool disengaged = false;
 unsigned long status_time = 0;
+unsigned long ULONG_MAX = 4294967295;
 
 void loop()
 {
-  locked = analogRead(SERVO_FEEDBACK) < SERVO_LOCKED_THRESHOLD;
-  closed = !digitalRead(HALL_SENSOR);
+  if (analogRead(SERVO_FEEDBACK) < SERVO_LOCKED_THRESHOLD != locked) {
+    locked = !locked;
+    status_time = ULONG_MAX;
+  }
+  if (!digitalRead(HALL_SENSOR) != closed) {
+    closed = !closed;
+    status_time = ULONG_MAX;
+  }
 
   unsigned long now_time = millis();
   if (now_time < status_time || now_time - status_time > 1000) {
@@ -126,17 +133,20 @@ void servo_lock() {
   servo.writeMicroseconds(SERVO_NUM, LOCKED);
   locked = true;
   disengaged = false;
+  status_time = ULONG_MAX;
 }
 
 void servo_unlock() {
   servo.writeMicroseconds(SERVO_NUM, UNLOCKED);
   locked = false;
   disengaged = false;
+  status_time = ULONG_MAX;
 }
 
 void servo_disengage() {
   servo.writeMicroseconds(SERVO_NUM, 0);
   disengaged = true;
+  status_time = ULONG_MAX;
 }
 
 void write_status() {
