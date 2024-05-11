@@ -8,6 +8,9 @@
 import Foundation
 import CoreBluetooth
 import Combine
+#if canImport(ActivityKit)
+import ActivityKit
+#endif
 
 public class BluelockCentralDelegate: NSObject, CBCentralManagerDelegate, ObservableObject {
     @Published var scanned: [ScannedPeripheral] = []
@@ -148,6 +151,11 @@ public class BluelockCentralDelegate: NSObject, CBCentralManagerDelegate, Observ
                 connect(peripheral)
             }
         }
+        
+        #if canImport(ActivityKit)
+        let del = getPeripheralDelegate(peripheral)
+        del.updateActivity(lockState: del.lockState, linkQuality: LinkQuality(distance: dist))
+        #endif
     }
     
     @MainActor
@@ -157,29 +165,26 @@ public class BluelockCentralDelegate: NSObject, CBCentralManagerDelegate, Observ
     
     @MainActor
     public func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: (any Error)?) {
-        if let conf = BluelockDb.main.retrieve(peripheral: peripheral) {
-            if conf.autoconnect {
-                central.connect(peripheral)
-                return
-            }
-        }
+        handleDisconnect(central, peripheral: peripheral)
     }
     
     public func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: (any Error)?) {
-        if let conf = BluelockDb.main.retrieve(peripheral: peripheral) {
-            if conf.autoconnect {
-                central.connect(peripheral)
-                return
-            }
-        }
+        handleDisconnect(central, peripheral: peripheral)
     }
     
     @MainActor
     public func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, timestamp: CFAbsoluteTime, isReconnecting: Bool, error: (any Error)?) {
+        handleDisconnect(central, peripheral: peripheral)
+    }
+    
+    public func handleDisconnect(_ central: CBCentralManager, peripheral: CBPeripheral) {
         if let conf = BluelockDb.main.retrieve(peripheral: peripheral) {
             if conf.autoconnect {
                 central.connect(peripheral)
-                return
+            } else {
+                #if canImport(ActivityKit)
+                // getPeripheralDelegate(peripheral).activity?.end()
+                #endif
             }
         }
     }

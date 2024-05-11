@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public enum LinkQuality {
+public enum LinkQuality: Codable & Hashable & Comparable {
     /// Less than 1.25mm from the transmitter
     case great
     /// Less than 10m from the transmitter
@@ -45,6 +45,23 @@ public enum LinkQuality {
             return .red
         } else {
             return .secondary
+        }
+    }
+    
+    static public func < (lhs: Self, rhs: Self) -> Bool {
+        switch (lhs, rhs) {
+        case (.great, _):
+            return true
+        case (_, .great):
+            return false
+        case (.good, _):
+            return true
+        case (_, .good):
+            return false
+        case (.bad, _):
+            return true
+        default:
+            return false
         }
     }
 }

@@ -24,3 +24,25 @@ struct LinkQualityIcon: View {
             .foregroundStyle(linkQuality.color())
     }
 }
+
+#Preview {
+    VStack {
+        Spacer()
+        HStack {
+            Spacer()
+            LinkQualityIcon(.great)
+            Spacer()
+            LinkQualityIcon(.good)
+            Spacer()
+        }
+        Spacer()
+        HStack {
+            Spacer()
+            LinkQualityIcon(.bad)
+            Spacer()
+            LinkQualityIcon(.none)
+            Spacer()
+        }
+        Spacer()
+    }
+}

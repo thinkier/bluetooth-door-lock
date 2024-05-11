@@ -8,15 +8,20 @@
 import SwiftUI
 
 struct DoorStateItem: View {
+    var withText: Bool = true
     var state: DeviceReportedState?
     
     var body: some View {
         if state?.closed == true {
-            Text("Closed")
+            if withText {
+                Text("Closed")
+            }
             Image(systemName: getIconName())
                 .symbolRenderingMode(.hierarchical)
         } else {
-            Text("Open")
+            if withText {
+                Text("Open")
+            }
             Image(systemName: getIconName())
                 .symbolRenderingMode(.hierarchical)
         }

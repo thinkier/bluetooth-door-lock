@@ -9,6 +9,9 @@ import Foundation
 import CoreBluetooth
 //import CoreHaptics
 import UserNotifications
+#if canImport(ActivityKit)
+import ActivityKit
+#endif
 
 public class BluelockPeripheralDelegate: NSObject, CBPeripheralDelegate, ObservableObject {
     //    let engine: CHHapticEngine
@@ -18,6 +21,9 @@ public class BluelockPeripheralDelegate: NSObject, CBPeripheralDelegate, Observa
     @Published var lastUpdated: ContinuousClock.Instant?
     @Published var lastActuated: ContinuousClock.Instant?
     @Published var lockState: DeviceReportedState?
+    #if canImport(ActivityKit)
+    @Published var activity: Activity<LockAttributes>?
+    #endif
     
     var peripheral: CBPeripheral
     var config: DeviceConfiguration?
@@ -122,9 +128,11 @@ public class BluelockPeripheralDelegate: NSObject, CBPeripheralDelegate, Observa
                 return
             }
             
-            let distance = estimateDistance()
+            let distance = distance()
             let qual = LinkQuality(distance: distance)
             
+            updateActivity(lockState: lockState, linkQuality: qual)
+
             if config.autounlock && lockState.closed == true && lockState.locked {
                 if qual == .great {
                     setState(peripheral, locked: false)
@@ -174,7 +182,7 @@ public class BluelockPeripheralDelegate: NSObject, CBPeripheralDelegate, Observa
             }
             
             if lockState != repState {
-                // TODO ActivityKit update
+                updateActivity(lockState: repState, linkQuality: LinkQuality(distance: distance()))
                 if lockState != nil {
                     showNotification(locked: repState.locked)
                     lastActuated = ContinuousClock.now
@@ -186,7 +194,18 @@ public class BluelockPeripheralDelegate: NSObject, CBPeripheralDelegate, Observa
         }
     }
     
-    public func estimateDistance() -> Float {
-        return Bluelock.estimateDistance(rssi: rssi, txPower: txPower)
+    public func updateActivity(lockState: DeviceReportedState?, linkQuality: LinkQuality) {
+        #if canImport(ActivityKit)
+        Task {
+            await activity?.update(ActivityContent(state: LockAttributes.ContentState(
+                lockState: lockState,
+                linkQuality: linkQuality
+            ), staleDate: nil))
+        }
+        #endif
+    }
+    
+    public func distance() -> Float {
+        return estimateDistance(rssi: rssi, txPower: txPower)
     }
 }

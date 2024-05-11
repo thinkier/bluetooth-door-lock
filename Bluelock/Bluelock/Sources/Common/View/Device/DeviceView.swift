@@ -59,7 +59,7 @@ struct DeviceView: View {
                 }
             } else {
                 if peripheral.state == .connected {
-                    self.scanned = ScannedPeripheral(name: nil, rssi: currentLock.rssi, txPowerLevel: currentLock.txPower, distance: currentLock.estimateDistance(), date: Date(), peripheral: peripheral)
+                    self.scanned = ScannedPeripheral(name: nil, rssi: currentLock.rssi, txPowerLevel: currentLock.txPower, distance: currentLock.distance(), date: Date(), peripheral: peripheral)
                     blueCentral.disconnect(peripheral)
                 }
             }

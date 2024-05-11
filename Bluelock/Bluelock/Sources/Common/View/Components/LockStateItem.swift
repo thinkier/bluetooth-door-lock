@@ -8,23 +8,32 @@
 import SwiftUI
 
 struct LockStateItem: View {
+    var withText: Bool = true
     var state: DeviceReportedState
     
     var body: some View {
         if state.disengaged {
             if state.locked {
-                Text("Locked")
+                if withText {
+                    Text("Locked")
+                }
                 Image(systemName: getIconName())
             } else {
-                Text("Unlocked")
+                if withText {
+                    Text("Unlocked")
+                }
                 Image(systemName: getIconName())
             }
         } else {
             if state.locked {
-                Text("Locked")
+                if withText {
+                    Text("Locked")
+                }
                 Image(systemName: getIconName() + ".fill")
             } else {
-                Text("Unlocked")
+                if withText {
+                    Text("Unlocked")
+                }
                 Image(systemName: getIconName() + ".fill")
             }
         }

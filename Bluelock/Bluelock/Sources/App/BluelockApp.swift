@@ -5,6 +5,7 @@
 //  Created by Matthew on 8/4/2024.
 //
 
+import ActivityKit
 import SwiftUI
 import UIKit
 import UserNotifications

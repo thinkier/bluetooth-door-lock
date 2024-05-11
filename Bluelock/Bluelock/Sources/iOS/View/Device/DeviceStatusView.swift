@@ -76,6 +76,20 @@ struct DeviceStatusView: View {
                         DoorStateItem(state: lockState)
                             .foregroundStyle(Color.secondary)
                     }
+                    
+                    HStack {
+                        Button("Activity", systemImage: "iphone.gen3", action: {
+                            if currentLock.activity == nil {
+                                currentLock.activity = LockActivityConfiguration()
+                                    .create(
+                                        peripheral: peripheral,
+                                        lockState: lockState,
+                                        linkQuality: LinkQuality(distance: currentLock.distance())
+                                    )
+                            }
+                        })
+                        .symbolRenderingMode(.hierarchical)
+                    }
                 } else {
                     Label(
                         title: {
@@ -124,7 +138,7 @@ struct DeviceStatusView: View {
     func refreshAllowLockUpdate() {
         var distanceConfig = false;
         
-        let distance = currentLock.estimateDistance()
+        let distance = currentLock.distance()
         let great = LinkQuality(distance: distance) == .great
         switch (config.autolock, config.autounlock) {
         case (false, false):

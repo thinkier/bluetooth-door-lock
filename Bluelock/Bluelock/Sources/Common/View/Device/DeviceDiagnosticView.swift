@@ -52,7 +52,7 @@ struct DeviceDiagnosticView: View {
                     Label("Distance Estimate", systemImage: "ruler")
                         .symbolRenderingMode(.hierarchical)
                     Spacer()
-                    Text((scanned?.distance ?? currentLock.estimateDistance()).description + "m")
+                    Text((scanned?.distance ?? currentLock.distance()).description + "m")
                         .foregroundStyle(Color.secondary)
                 }
             }
