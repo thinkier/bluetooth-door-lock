@@ -17,7 +17,7 @@ struct LockActivityConfiguration: Widget {
         ActivityConfiguration(for: LockAttributes.self) { context in
             HStack {
                 if context.state.lockState != nil {
-                    DoorLockCombinedStateIcon(state: context.state.lockState!)
+                    DoorLockCombinedStateIcon(compact: false, state: context.state.lockState!)
                 }
                 Text(context.attributes.name)
                 Spacer()
@@ -30,8 +30,9 @@ struct LockActivityConfiguration: Widget {
                     DynamicIslandExpandedRegion(.leading) {
                         if context.state.lockState != nil {
                             HStack {
-                                DoorLockCombinedStateIcon(state: context.state.lockState!)
+                                DoorLockCombinedStateIcon(compact: false, state: context.state.lockState!)
                             }
+                            .padding(.leading, 10)
                         }
                     }
                     DynamicIslandExpandedRegion(.center){
@@ -41,6 +42,7 @@ struct LockActivityConfiguration: Widget {
                         HStack {
                             LinkQualityIcon(context.state.linkQuality)
                         }
+                        .padding(.trailing, 10)
                     }
                 },
                 compactLeading: {

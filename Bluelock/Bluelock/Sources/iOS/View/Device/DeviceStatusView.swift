@@ -50,6 +50,7 @@ struct DeviceStatusView: View {
                     HStack {
                         Label("Lock", systemImage: LockStateItem(state: lockState).getIconName())
                             .symbolRenderingMode(.hierarchical)
+                            .contentTransition(.symbolEffect(.replace))
                         Spacer()
                         Menu {
                             Button {
@@ -72,6 +73,7 @@ struct DeviceStatusView: View {
                     HStack {
                         Label("Door", systemImage: DoorStateItem(state: lockState).getIconName())
                             .symbolRenderingMode(.hierarchical)
+                            .contentTransition(.symbolEffect(.replace))
                         Spacer()
                         DoorStateItem(state: lockState)
                             .foregroundStyle(Color.secondary)
@@ -79,7 +81,7 @@ struct DeviceStatusView: View {
                     
                     HStack {
                         Button("Activity", systemImage: "iphone.gen3", action: {
-                            if currentLock.activity == nil {
+                            if currentLock.activity == nil || currentLock.activity!.activityState != .active {
                                 currentLock.activity = LockActivityConfiguration()
                                     .create(
                                         peripheral: peripheral,

@@ -41,27 +41,32 @@ public enum LinkQuality: Codable & Hashable & Comparable {
     }
     
     public func color() -> Color {
-        if self == .none {
+        switch self {
+        case .great:
+            return .green
+        case .good:
+            return .yellow
+        case .bad:
             return .red
-        } else {
+        default:
             return .secondary
         }
     }
     
-    static public func < (lhs: Self, rhs: Self) -> Bool {
-        switch (lhs, rhs) {
-        case (.great, _):
-            return true
-        case (_, .great):
-            return false
-        case (.good, _):
-            return true
-        case (_, .good):
-            return false
-        case (.bad, _):
-            return true
+    public func score() -> Double {
+        switch self {
+        case .great:
+            return 1
+        case .good:
+            return 2/3
+        case .bad:
+            return 1/3
         default:
-            return false
+            return 0
         }
+    }
+    
+    static public func < (lhs: Self, rhs: Self) -> Bool {
+        return rhs.score() < lhs.score()
     }
 }

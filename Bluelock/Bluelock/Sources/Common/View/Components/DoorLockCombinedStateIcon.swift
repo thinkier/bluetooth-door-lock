@@ -9,17 +9,27 @@
 import SwiftUI
 
 struct DoorLockCombinedStateIcon: View {
+    var compact = true
     var state: DeviceReportedState
     
     var body: some View {
-        ZStack(alignment: .center) {
-            DoorStateItem(withText: false, state: state)
-                .foregroundStyle(.secondary)
-            if state.closed {
+        HStack {
+            if compact {
+                ZStack(alignment: .center) {
+                    DoorStateItem(withText: false, state: state)
+                        .foregroundStyle(.secondary)
+                    if state.closed {
+                        LockStateItem(withText: false, state: state)
+                            .foregroundStyle(Color.accentColor)
+                            .scaleEffect(0.75)
+                            .padding(.leading, 16)
+                    }
+                }
+            } else {
+                DoorStateItem(withText: false, state: state)
+                    .foregroundStyle(.secondary)
                 LockStateItem(withText: false, state: state)
                     .foregroundStyle(Color.accentColor)
-                    .scaleEffect(0.75)
-                    .padding(.leading, 16)
             }
         }
         .scaleEffect(1.25)

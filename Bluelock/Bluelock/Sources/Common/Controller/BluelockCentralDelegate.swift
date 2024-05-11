@@ -154,7 +154,7 @@ public class BluelockCentralDelegate: NSObject, CBCentralManagerDelegate, Observ
         
         #if canImport(ActivityKit)
         let del = getPeripheralDelegate(peripheral)
-        del.updateActivity(lockState: del.lockState, linkQuality: LinkQuality(distance: dist))
+        del.updateToUser(lockState: del.lockState, linkQuality: LinkQuality(distance: dist))
         #endif
     }
     

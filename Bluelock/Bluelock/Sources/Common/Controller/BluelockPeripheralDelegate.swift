@@ -21,9 +21,9 @@ public class BluelockPeripheralDelegate: NSObject, CBPeripheralDelegate, Observa
     @Published var lastUpdated: ContinuousClock.Instant?
     @Published var lastActuated: ContinuousClock.Instant?
     @Published var lockState: DeviceReportedState?
-    #if canImport(ActivityKit)
+#if canImport(ActivityKit)
     @Published var activity: Activity<LockAttributes>?
-    #endif
+#endif
     
     var peripheral: CBPeripheral
     var config: DeviceConfiguration?
@@ -131,8 +131,8 @@ public class BluelockPeripheralDelegate: NSObject, CBPeripheralDelegate, Observa
             let distance = distance()
             let qual = LinkQuality(distance: distance)
             
-            updateActivity(lockState: lockState, linkQuality: qual)
-
+            updateToUser(lockState: lockState, linkQuality: qual)
+            
             if config.autounlock && lockState.closed == true && lockState.locked {
                 if qual == .great {
                     setState(peripheral, locked: false)
@@ -182,9 +182,8 @@ public class BluelockPeripheralDelegate: NSObject, CBPeripheralDelegate, Observa
             }
             
             if lockState != repState {
-                updateActivity(lockState: repState, linkQuality: LinkQuality(distance: distance()))
+                updateToUser(lockState: repState, linkQuality: LinkQuality(distance: distance()))
                 if lockState != nil {
-                    showNotification(locked: repState.locked)
                     lastActuated = ContinuousClock.now
                 }
             }
@@ -194,15 +193,41 @@ public class BluelockPeripheralDelegate: NSObject, CBPeripheralDelegate, Observa
         }
     }
     
-    public func updateActivity(lockState: DeviceReportedState?, linkQuality: LinkQuality) {
-        #if canImport(ActivityKit)
+    public func updateToUser(lockState: DeviceReportedState?, linkQuality: LinkQuality) {
+#if canImport(ActivityKit)
         Task {
-            await activity?.update(ActivityContent(state: LockAttributes.ContentState(
+            let content = ActivityContent(
+                state: LockAttributes.ContentState(
                 lockState: lockState,
                 linkQuality: linkQuality
-            ), staleDate: nil))
+            ), staleDate: nil)
+            var alertConfiguration: AlertConfiguration? = nil
+            
+            /// Until such time that Live Activities can dispatch Time Sensitive / Critical Alerts, this isn't very useful.
+            // if let lockState = lockState {
+            //     if lockState != self.lockState {
+            //         alertConfiguration = AlertConfiguration(
+            //             title: lockState.locked ? "Locked" : "Unlocked",
+            //             body: LocalizedStringResource(stringLiteral: peripheral.name ?? "Unknown Device"),
+            //             sound: .default)
+            //     }
+            // }
+            
+            await activity?.update(content,
+                                   alertConfiguration: alertConfiguration)
         }
-        #endif
+        
+        // if activity?.activityState == .active {
+        //     return
+        // }
+#endif
+        if lockState == self.lockState || self.lockState == nil {
+            return
+        }
+        guard let lockState = lockState else {
+            return
+        }
+        showNotification(locked: lockState.locked)
     }
     
     public func distance() -> Float {

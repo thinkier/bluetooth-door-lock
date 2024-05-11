@@ -19,9 +19,9 @@ struct LinkQualityIcon: View {
     }
     
     var body: some View {
-        Image(systemName: linkQuality.iconName())
-            .symbolRenderingMode(.hierarchical)
+        Image(systemName: "chart.bar.fill")
             .foregroundStyle(linkQuality.color())
+            .symbolRenderingMode(.hierarchical)
     }
 }
 
