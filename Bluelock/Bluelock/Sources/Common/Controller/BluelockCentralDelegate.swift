@@ -165,12 +165,17 @@ public class BluelockCentralDelegate: NSObject, CBCentralManagerDelegate, Observ
         }
     }
     
+    public func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: (any Error)?) {
+        if let conf = BluelockDb.main.retrieve(peripheral: peripheral) {
+            if conf.autoconnect {
+                central.connect(peripheral)
+                return
+            }
+        }
+    }
+    
     @MainActor
     public func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, timestamp: CFAbsoluteTime, isReconnecting: Bool, error: (any Error)?) {
-        if isReconnecting {
-            return
-        }
-        
         if let conf = BluelockDb.main.retrieve(peripheral: peripheral) {
             if conf.autoconnect {
                 central.connect(peripheral)

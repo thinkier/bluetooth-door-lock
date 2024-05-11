@@ -16,6 +16,7 @@ public class BluelockPeripheralDelegate: NSObject, CBPeripheralDelegate, Observa
     @Published var rssi: Float
     @Published var txPower: Float
     @Published var lastUpdated: ContinuousClock.Instant?
+    @Published var lastActuated: ContinuousClock.Instant?
     @Published var lockState: DeviceReportedState?
     
     var peripheral: CBPeripheral
@@ -36,7 +37,7 @@ public class BluelockPeripheralDelegate: NSObject, CBPeripheralDelegate, Observa
         }
         
         peripheral.writeValue(((locked ? "l" : "u") + "wd").data(using: .utf8)!, for: tx, type: .withResponse)
-        dispatchNotification(locked: locked)
+        //        showNotification(locked: locked)
         //        playHaptics(locked: locked)
     }
     
@@ -69,15 +70,15 @@ public class BluelockPeripheralDelegate: NSObject, CBPeripheralDelegate, Observa
     //        }
     //    }
     
-    func dispatchNotification(locked: Bool) {
+    func showNotification(locked: Bool) {
         let name = peripheral.name ?? "Unknown Device"
         let lockedString = (locked ? "Locked" : "Unlocked")
         let uuidString = UUID().uuidString
         let content = UNMutableNotificationContent()
         content.title = lockedString + ": " + name
         content.body = name + " was " + lockedString.lowercased()
-        content.sound =  .defaultCritical
-        content.interruptionLevel = .critical
+        content.sound = locked ? .default : .defaultCriticalSound(withAudioVolume: 0.5)
+        content.interruptionLevel = locked ? .timeSensitive : .critical
         let request = UNNotificationRequest(identifier: uuidString, content: content, trigger: nil)
         
         // Schedule the request with the system.
@@ -110,6 +111,10 @@ public class BluelockPeripheralDelegate: NSObject, CBPeripheralDelegate, Observa
         
         if let newConfig = BluelockDb.main.retrieve(peripheral: peripheral) {
             config = newConfig
+        }
+        
+        if (lastActuated?.duration(to: ContinuousClock.now)).map({ $0 < .seconds(2) }) ?? false {
+            return;
         }
         
         if let config = config {
@@ -166,6 +171,14 @@ public class BluelockPeripheralDelegate: NSObject, CBPeripheralDelegate, Observa
             
             guard let repState = try? JSONDecoder().decode(DeviceReportedState.self, from: characteristic.value!) else {
                 return
+            }
+            
+            if lockState != repState {
+                // TODO ActivityKit update
+                if lockState != nil {
+                    showNotification(locked: repState.locked)
+                    lastActuated = ContinuousClock.now
+                }
             }
             
             lockState = repState
