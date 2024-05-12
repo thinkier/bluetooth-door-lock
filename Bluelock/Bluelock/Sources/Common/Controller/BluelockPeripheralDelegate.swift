@@ -21,6 +21,7 @@ public class BluelockPeripheralDelegate: NSObject, CBPeripheralDelegate, Observa
     @Published var lastUpdated: ContinuousClock.Instant?
     @Published var lastActuated: ContinuousClock.Instant?
     @Published var lockState: DeviceReportedState?
+    @Published var lockIntentLocked: Bool? = nil
 #if canImport(ActivityKit)
     @Published var activity: Activity<LockAttributes>?
 #endif
@@ -41,6 +42,8 @@ public class BluelockPeripheralDelegate: NSObject, CBPeripheralDelegate, Observa
         guard let tx = getWriteCharacteristic(peripheral) else {
             return
         }
+        
+        lockIntentLocked = locked
         
         peripheral.writeValue(((locked ? "l" : "u") + "wd").data(using: .utf8)!, for: tx, type: .withResponse)
         //        showNotification(locked: locked)
@@ -80,11 +83,13 @@ public class BluelockPeripheralDelegate: NSObject, CBPeripheralDelegate, Observa
         let name = peripheral.name ?? "Unknown Device"
         let lockedString = (locked ? "Locked" : "Unlocked")
         let uuidString = UUID().uuidString
+        let critical = !locked && lockIntentLocked != locked
+        
         let content = UNMutableNotificationContent()
         content.title = lockedString + ": " + name
         content.body = name + " was " + lockedString.lowercased()
-        content.sound = locked ? .default : .defaultCriticalSound(withAudioVolume: 0.5)
-        content.interruptionLevel = locked ? .timeSensitive : .critical
+        content.sound = critical ? .defaultCriticalSound(withAudioVolume: 0.5) : .default
+        content.interruptionLevel = critical ? .critical : .timeSensitive
         let request = UNNotificationRequest(identifier: uuidString, content: content, trigger: nil)
         
         // Schedule the request with the system.
