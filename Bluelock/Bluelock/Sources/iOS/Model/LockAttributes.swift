@@ -13,6 +13,7 @@ struct LockAttributes: ActivityAttributes {
     struct ContentState: Codable & Hashable {
         let lockState: DeviceReportedState?
         let linkQuality: LinkQuality
+        var lastUpdated = Date.now
     }
     
     let peer: UUID

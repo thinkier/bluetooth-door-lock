@@ -19,7 +19,7 @@ struct LinkQualityIcon: View {
     }
     
     var body: some View {
-        Image(systemName: "chart.bar.fill")
+        Image(systemName: "chart.bar\(linkQuality == .none ? "" : ".fill")")
             .foregroundStyle(linkQuality.color())
             .symbolRenderingMode(.hierarchical)
     }

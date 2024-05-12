@@ -10,9 +10,9 @@ import SwiftUI
 public enum LinkQuality: Codable & Hashable & Comparable {
     /// Less than 1.25mm from the transmitter
     case great
-    /// Less than 10m from the transmitter
+    /// Less than 8m from the transmitter
     case good
-    /// Greater than 10m from the transmitter
+    /// Greater than 16m from the transmitter
     case bad
     /// Out of range
     case none
@@ -20,23 +20,12 @@ public enum LinkQuality: Codable & Hashable & Comparable {
     public init(distance: Float) {
         if distance <= 1.25 {
             self = .great
-        } else if distance <= 10 {
+        } else if distance <= 8 {
             self = .good
-        } else if distance <= 100 {
+        } else if distance <= 16 {
             self = .bad
         } else {
             self = .none
-        }
-    }
-    
-    public func iconName() -> String {
-        switch self {
-        case .great:
-            return "wifi"
-        case .good:
-            return "wifi.exclamationmark"
-        default:
-            return "wifi.slash"
         }
     }
     

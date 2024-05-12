@@ -18,10 +18,11 @@ struct LockActivityConfiguration: Widget {
             HStack {
                 if context.state.lockState != nil {
                     DoorLockCombinedStateIcon(compact: false, state: context.state.lockState!)
+                        .padding(.leading, 10)
                 }
                 Text(context.attributes.name)
                 Spacer()
-                LinkQualityIcon(context.state.linkQuality)
+                LinkQualityIcon(Date.now.timeIntervalSince(context.state.lastUpdated) > 10 ? .none : context.state.linkQuality)
             }
             .padding(10)
         } dynamicIsland: { context in
