@@ -15,8 +15,8 @@ struct ConnectionIcon: View {
         if isAutoConnect == true {
             Image(systemName: "wave.3.left")
                 .symbolRenderingMode(.hierarchical)
-                .symbolEffect(.variableColor, isActive: true)
-                .foregroundStyle(isConnected == true ? Color.green : Color.secondary)
+                .symbolEffect(.variableColor, isActive: !isConnected)
+                .foregroundStyle(isConnected ? Color.green : Color.secondary)
         }
         if isConnected {
             Image(systemName: "link")

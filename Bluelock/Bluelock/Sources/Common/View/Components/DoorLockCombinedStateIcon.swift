@@ -11,6 +11,7 @@ import SwiftUI
 struct DoorLockCombinedStateIcon: View {
     var compact = true
     var state: DeviceReportedState
+    var linkQuality = LinkQuality.great
     
     var body: some View {
         HStack {
@@ -19,7 +20,7 @@ struct DoorLockCombinedStateIcon: View {
                     DoorStateItem(withText: false, state: state)
                         .foregroundStyle(.secondary)
                     if state.closed {
-                        LockStateItem(withText: false, state: state)
+                        LockStateItem(withText: false, state: state, linkQuality: linkQuality)
                             .foregroundStyle(Color.accentColor)
                             .scaleEffect(0.75)
                             .padding(.leading, 16)
@@ -28,7 +29,7 @@ struct DoorLockCombinedStateIcon: View {
             } else {
                 DoorStateItem(withText: false, state: state)
                     .foregroundStyle(.secondary)
-                LockStateItem(withText: false, state: state)
+                LockStateItem(withText: false, state: state, linkQuality: linkQuality)
                     .foregroundStyle(Color.accentColor)
             }
         }

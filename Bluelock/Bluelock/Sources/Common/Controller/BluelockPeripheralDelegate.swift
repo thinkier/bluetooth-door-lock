@@ -34,6 +34,10 @@ public class BluelockPeripheralDelegate: NSObject, CBPeripheralDelegate, Observa
         self.txPower = txPower
         self.rssi = rssi
         
+#if canImport(ActivityKit)
+        self.activity = Activity<LockAttributes>.activities.filter { $0.attributes.peer == peripheral.identifier }.first
+#endif
+        
         //        engine = try! CHHapticEngine()
         //        try! engine.start()
     }
@@ -203,9 +207,9 @@ public class BluelockPeripheralDelegate: NSObject, CBPeripheralDelegate, Observa
         Task {
             let content = ActivityContent(
                 state: LockAttributes.ContentState(
-                lockState: lockState,
-                linkQuality: linkQuality
-            ), staleDate: nil)
+                    lockState: lockState,
+                    linkQuality: linkQuality
+                ), staleDate: nil)
             var alertConfiguration: AlertConfiguration? = nil
             
             /// Until such time that Live Activities can dispatch Time Sensitive / Critical Alerts, this isn't very useful.
@@ -230,6 +234,9 @@ public class BluelockPeripheralDelegate: NSObject, CBPeripheralDelegate, Observa
             return
         }
         guard let lockState = lockState else {
+            return
+        }
+        if !lockState.closed {
             return
         }
         showNotification(locked: lockState.locked)

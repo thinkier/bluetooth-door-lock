@@ -17,7 +17,11 @@ struct LockActivityConfiguration: Widget {
         ActivityConfiguration(for: LockAttributes.self) { context in
             HStack {
                 if context.state.lockState != nil {
-                    DoorLockCombinedStateIcon(compact: false, state: context.state.lockState!)
+                    DoorLockCombinedStateIcon(
+                        compact: false,
+                        state: context.state.lockState!,
+                        linkQuality: context.state.linkQuality
+                    )
                         .padding(.leading, 10)
                 }
                 Text(context.attributes.name)
@@ -31,7 +35,11 @@ struct LockActivityConfiguration: Widget {
                     DynamicIslandExpandedRegion(.leading) {
                         if context.state.lockState != nil {
                             HStack {
-                                DoorLockCombinedStateIcon(compact: false, state: context.state.lockState!)
+                                DoorLockCombinedStateIcon(
+                                    compact: false,
+                                    state: context.state.lockState!,
+                                    linkQuality: context.state.linkQuality
+                                )
                             }
                             .padding(.leading, 10)
                         }
@@ -48,14 +56,20 @@ struct LockActivityConfiguration: Widget {
                 },
                 compactLeading: {
                     if context.state.linkQuality != .none && context.state.lockState != nil {
-                        DoorLockCombinedStateIcon(state: context.state.lockState!)
+                        DoorLockCombinedStateIcon(
+                            state: context.state.lockState!,
+                            linkQuality: context.state.linkQuality
+                        )
                     }
                 },
                 compactTrailing: {
                 },
                 minimal: {
                     if context.state.linkQuality != .none && context.state.lockState != nil {
-                        DoorLockCombinedStateIcon(state: context.state.lockState!)
+                        DoorLockCombinedStateIcon(
+                            state: context.state.lockState!,
+                            linkQuality: context.state.linkQuality
+                        )
                     }
                 }
             )

@@ -10,40 +10,27 @@ import SwiftUI
 struct LockStateItem: View {
     var withText: Bool = true
     var state: DeviceReportedState
+    var linkQuality = LinkQuality.great
     
     var body: some View {
-        if state.disengaged {
-            if state.locked {
-                if withText {
-                    Text("Locked")
-                }
-                Image(systemName: getIconName())
-            } else {
-                if withText {
-                    Text("Unlocked")
-                }
-                Image(systemName: getIconName())
-            }
-        } else {
-            if state.locked {
-                if withText {
-                    Text("Locked")
-                }
-                Image(systemName: getIconName() + ".fill")
-            } else {
-                if withText {
-                    Text("Unlocked")
-                }
-                Image(systemName: getIconName() + ".fill")
-            }
+        if withText {
+            Text(state.locked ? "Locked" : "Unlocked")
         }
+        Image(systemName: getIconName())
+            .symbolRenderingMode(.hierarchical)
     }
     
     func getIconName() -> String {
-        if state.locked {
-            "lock"
-        } else {
-            "lock.open"
+        var icon = "lock"
+        if !state.locked {
+            icon += ".open"
+        } else if linkQuality == .none {
+            icon += ".slash"
         }
+        if !state.disengaged || linkQuality == .none {
+            icon += ".fill"
+        }
+        
+        return icon
     }
 }

@@ -8,6 +8,7 @@
 import SwiftUI
 import CoreBluetooth
 import Combine
+import ActivityKit
 
 struct DeviceStatusView: View {
     var peripheral: CBPeripheral

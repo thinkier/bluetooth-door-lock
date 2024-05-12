@@ -5,7 +5,9 @@
 //  Created by Matthew on 8/4/2024.
 //
 
+#if canImport(ActivityKit)
 import ActivityKit
+#endif
 import SwiftUI
 import UIKit
 import UserNotifications
