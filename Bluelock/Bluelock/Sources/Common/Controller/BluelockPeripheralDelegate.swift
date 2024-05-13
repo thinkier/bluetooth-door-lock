@@ -230,13 +230,16 @@ public class BluelockPeripheralDelegate: NSObject, CBPeripheralDelegate, Observa
         //     return
         // }
 #endif
-        if lockState == self.lockState || self.lockState == nil {
+        if self.lockState == nil {
             return
         }
         guard let lockState = lockState else {
             return
         }
         if !lockState.closed {
+            return
+        }
+        if lockState.locked == self.lockState?.locked {
             return
         }
         showNotification(locked: lockState.locked)

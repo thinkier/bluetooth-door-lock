@@ -110,7 +110,7 @@ struct DeviceStatusView: View {
     func refreshAllowLockUpdate() {
         var distanceConfig = false;
         
-        let distance = currentLock.estimateDistance()
+        let distance = currentLock.distance()
         let great = LinkQuality(distance: distance) == .great
         switch (config.autolock, config.autounlock) {
         case (false, false):
