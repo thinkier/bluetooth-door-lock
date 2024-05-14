@@ -37,6 +37,7 @@ void setup()
   Bluefruit.begin();
   Bluefruit.setTxPower(-12);    // Check bluefruit.h for supported values
 
+  Bluefruit.Security.setMITM(true);
   Bluefruit.Security.setIOCaps(true, false, false); // display = true, yes/no = false, keyboard = false
   Bluefruit.Security.setPairPasskeyCallback(pairing_passkey_callback);
 
@@ -56,7 +57,6 @@ void startAdv(void)
   // Advertising packet
   Bluefruit.Advertising.addFlags(BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE);
   Bluefruit.Advertising.addTxPower();
-
   Bluefruit.Advertising.addUuid(bluelockId);
 
   // Secondary Scan Response packet (optional)
@@ -97,7 +97,7 @@ void loop()
   }
 
   unsigned long now_time = millis();
-  if (now_time < status_time || now_time - status_time > 1000) {
+  if (status_time > now_time || now_time - status_time > 1000) {
     status_time = now_time;
     write_status();
   }
@@ -166,6 +166,7 @@ void connect_callback(uint16_t conn_handle)
 {
   // Get the reference to current connection
   BLEConnection* connection = Bluefruit.Connection(conn_handle);
+  connection->requestPairing();
 
   char central_name[32] = { 0 };
   connection->getPeerName(central_name, sizeof(central_name));
@@ -232,7 +233,7 @@ void pairing_complete_callback(uint16_t conn_handle, uint8_t auth_status)
   if (auth_status == BLE_GAP_SEC_STATUS_SUCCESS)
   {
     Serial.println("Succeeded");
-  }else
+  } else
   {
     Serial.println("Failed");
   }
