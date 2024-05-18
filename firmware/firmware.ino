@@ -5,6 +5,7 @@
 #include <Adafruit_TinyUSB.h>
 #include <Wire.h>
 #include <Adafruit_PWMServoDriver.h>
+#include "BLETps.h"
 
 #define LOCKED  1575
 #define UNLOCKED  2300
@@ -13,11 +14,15 @@
 
 #define SERVO_LOCKED_THRESHOLD 410
 
+#define TX_POWER -12
+
 #define SERVO_FEEDBACK A1
 #define HALL_SENSOR A0
 
 // BLE Service
 BLEUart bleuart; // uart over ble
+BLETps bletps(TX_POWER);
+
 Adafruit_PWMServoDriver servo = Adafruit_PWMServoDriver();
 
 const uint8_t bluelockUuid[] = {0x1C, 0xDC, 0x15, 0xE1, 0x36, 0x6D, 0x2C, 0x98, 0x97, 0x75, 0x2F, 0x01, 0x01, 0xE1, 0x8E, 0x01};
@@ -35,7 +40,7 @@ void setup()
   Bluefruit.configPrphBandwidth(BANDWIDTH_MAX);
 
   Bluefruit.begin();
-  Bluefruit.setTxPower(-12);    // Check bluefruit.h for supported values
+  Bluefruit.setTxPower(TX_POWER);    // Check bluefruit.h for supported values
 
   Bluefruit.Security.setMITM(true);
   Bluefruit.Security.setIOCaps(true, false, false); // display = true, yes/no = false, keyboard = false
@@ -48,6 +53,7 @@ void setup()
 
   bleuart.setPermission(SECMODE_ENC_WITH_LESC_MITM, SECMODE_ENC_WITH_LESC_MITM);
   bleuart.begin();
+  bletps.begin();
 
   startAdv();
 }
