@@ -38,6 +38,7 @@ let project = Project(
             name: "Bluelock Widgets",
             destinations: .iOS,
             product: .appExtension,
+            productName: "Bluelock",
             bundleId: "io.github.thinkier.Bluelock.widgets",
             infoPlist: .extendingDefault(
                 with: [
@@ -70,7 +71,7 @@ let project = Project(
                 ]
             ),
             sources: ["Bluelock/Sources/Common/**", "Bluelock/Sources/watchOS/**", "Bluelock/Sources/App/**"],
-            resources: ["Bluelock/Resources/Common/**", "Bluelock/Resources/watchOS/**"],
+            resources: ["Bluelock/Resources/Common/**"],
             entitlements: "Bluelock/Bluelock.entitlements",
             dependencies: [.package(product: "SQLite", type: .runtime)]
         )
