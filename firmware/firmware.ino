@@ -90,7 +90,6 @@ bool closed = false;
 bool disengaged = false;
 unsigned long status_time = 0;
 unsigned long ULONG_MAX = 4294967295;
-unsigned long connect_time = 0;
 
 void loop()
 {
@@ -103,17 +102,7 @@ void loop()
     status_time = ULONG_MAX;
   }
 
-  // Force a disconnect if peer has been connected for 30 seconds but hasn't complete authentication
   unsigned long now_time = millis();
-  if (0 < connect_time && connect_time < now_time && now_time - connect_time > 30000 && Bluefruit.connected()) {
-    Serial.println("Removing peer due to lack of secure pairing.");
-    uint8_t handle = Bluefruit.connHandle();
-    Bluefruit.disconnect(handle);
-    while (Bluefruit.connected(handle)) {
-      delay(1);
-    }
-  }
-
   if (status_time > now_time || now_time - status_time > 1000) {
     status_time = now_time;
     write_status();
@@ -190,7 +179,6 @@ void connect_callback(uint16_t conn_handle)
 
   Serial.print("Connected to ");
   Serial.println(central_name);
-  connect_time = millis();
 }
 
 // callback invoked when pairing passkey is generated
@@ -200,7 +188,6 @@ void connect_callback(uint16_t conn_handle)
 //                  reject (false) the pairing process. Otherwise, return value has no effect
 bool pairing_passkey_callback(uint16_t conn_handle, uint8_t const passkey[6], bool match_request)
 {
-  connect_time = millis(); // Extend timeout if the remote responds to the pairing request
   Serial.println("Pairing Passkey");
   Serial.printf("    %.3s %.3s\n", passkey, passkey+3);
 
@@ -209,19 +196,16 @@ bool pairing_passkey_callback(uint16_t conn_handle, uint8_t const passkey[6], bo
 
 void pairing_complete_callback(uint16_t conn_handle, uint8_t auth_status)
 {
-  if (auth_status == BLE_GAP_SEC_STATUS_SUCCESS)
+  if (auth_status != BLE_GAP_SEC_STATUS_SUCCESS)
   {
-    Serial.println("Succeeded");
-  } else
-  {
-    Serial.println("Failed");
+    Serial.println("Secure pairing failed.");
+    sd_ble_gap_disconnect(conn_handle, BLE_HCI_AUTHENTICATION_FAILURE);
   }
 }
 
 void connection_secured_callback(uint16_t conn_handle)
 {
-  connect_time = 0; // Remove timeout if the connection is secured
-  Serial.println("Secured");
+  Serial.println("Connection secured.");
 }
 
 /**
