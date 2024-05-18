@@ -167,7 +167,11 @@ public class BluelockPeripheralDelegate: NSObject, CBPeripheralDelegate, Observa
             case .NordicUartServiceID:
                 peripheral.discoverCharacteristics([.NordicUartTxCharaID, .NordicUartRxCharaID], for: service)
                 continue
-            default: continue
+            case .BLETxPowerServiceID:
+                peripheral.discoverCharacteristics([.BLETxPowerLevelCharaID], for: service)
+                continue
+            default:
+                continue
             }
         }
     }
@@ -176,17 +180,25 @@ public class BluelockPeripheralDelegate: NSObject, CBPeripheralDelegate, Observa
         switch characteristic.uuid {
         case .NordicUartTxCharaID:
             peripheral.writeValue("s".data(using: .utf8)!, for: characteristic, type: .withResponse)
-            break;
+            break
         case .NordicUartRxCharaID:
             peripheral.setNotifyValue(true, for: characteristic)
-            break;
+            break
+        case .BLETxPowerLevelCharaID:
+            peripheral.readValue(for: characteristic)
+            break
         default:
-            return;
+            return
         }
     }
     
     public func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: (any Error)?) {
-        if characteristic.uuid == .NordicUartRxCharaID && characteristic.value != nil {
+        if characteristic.value == nil {
+            return
+        }
+        
+        switch characteristic.uuid {
+        case .NordicUartRxCharaID:
             peripheral.readRSSI()
             
             guard let repState = try? JSONDecoder().decode(DeviceReportedState.self, from: characteristic.value!) else {
@@ -202,6 +214,13 @@ public class BluelockPeripheralDelegate: NSObject, CBPeripheralDelegate, Observa
             
             lockState = repState
             lastUpdated = ContinuousClock.now
+            break
+        case .BLETxPowerLevelCharaID:
+            var power: Int8 = 0;
+            NSData(data: characteristic.value!).getBytes(&power, length: 1)
+            self.txPower = Float(power)
+            break
+        default: return
         }
     }
     
