@@ -90,6 +90,7 @@ bool closed = false;
 bool disengaged = false;
 unsigned long status_time = 0;
 unsigned long ULONG_MAX = 4294967295;
+unsigned long connect_time = 0;
 
 void loop()
 {
@@ -102,7 +103,17 @@ void loop()
     status_time = ULONG_MAX;
   }
 
+  // Force a disconnect if peer has been connected for 30 seconds but hasn't complete authentication
   unsigned long now_time = millis();
+  if (0 < connect_time && connect_time < now_time && now_time - connect_time > 30000 && Bluefruit.connected()) {
+    Serial.println("Removing peer due to lack of secure pairing.");
+    uint8_t handle = Bluefruit.connHandle();
+    Bluefruit.disconnect(handle);
+    while (Bluefruit.connected(handle)) {
+      delay(1);
+    }
+  }
+
   if (status_time > now_time || now_time - status_time > 1000) {
     status_time = now_time;
     write_status();
@@ -179,6 +190,7 @@ void connect_callback(uint16_t conn_handle)
 
   Serial.print("Connected to ");
   Serial.println(central_name);
+  connect_time = millis();
 }
 
 // callback invoked when pairing passkey is generated
@@ -188,48 +200,9 @@ void connect_callback(uint16_t conn_handle)
 //                  reject (false) the pairing process. Otherwise, return value has no effect
 bool pairing_passkey_callback(uint16_t conn_handle, uint8_t const passkey[6], bool match_request)
 {
+  connect_time = millis(); // Extend timeout if the remote responds to the pairing request
   Serial.println("Pairing Passkey");
   Serial.printf("    %.3s %.3s\n", passkey, passkey+3);
-
-  // match_request means peer wait for our approval
-  // return true to accept, false to decline
-  if (match_request)
-  {
-    bool accept_pairing = false;
-
-    Serial.println("Do you want to pair");
-    Serial.println("Enter <N> to Decline, <Y> to Accept");
-
-    // timeout for pressing button
-    uint32_t start_time = millis();
-
-    // wait until either button is pressed (30 seconds timeout)
-    while( millis() < start_time + 30000 )
-    {
-      char in = Serial.read();
-      if (in == 'Y')
-      {
-        accept_pairing = true;
-        break;
-      } else if (in == 'N') {
-        accept_pairing = false;
-        break;
-      }
-
-      // Peer is disconnected while waiting for input
-      if ( !Bluefruit.connected(conn_handle) ) break;
-    }
-
-    if (accept_pairing)
-    {
-      Serial.println("Accepted");
-    }else
-    {
-      Serial.println("Declined");
-    }
-
-    return accept_pairing;
-  }
 
   return true;
 }
@@ -247,6 +220,7 @@ void pairing_complete_callback(uint16_t conn_handle, uint8_t auth_status)
 
 void connection_secured_callback(uint16_t conn_handle)
 {
+  connect_time = 0; // Remove timeout if the connection is secured
   Serial.println("Secured");
 }
 
