@@ -15,7 +15,7 @@ let project = Project(
             name: "Bluelock iOS",
             destinations: .iOS,
             product: .app,
-            productName: "Bluelock",
+            productName: "BluelockApp",
             bundleId: "io.github.thinkier.Bluelock",
             deploymentTargets: .iOS("17.0"),
             infoPlist: .extendingDefault(
@@ -38,7 +38,7 @@ let project = Project(
             name: "Bluelock Widgets",
             destinations: .iOS,
             product: .appExtension,
-            productName: "Bluelock",
+            productName: "BluelockWidgets",
             bundleId: "io.github.thinkier.Bluelock.widgets",
             infoPlist: .extendingDefault(
                 with: [
@@ -55,7 +55,7 @@ let project = Project(
             name: "Bluelock watchOS",
             destinations: .watchOS,
             product: .app,
-            productName: "Bluelock",
+            productName: "BluelockApp",
             bundleId: "io.github.thinkier.Bluelock.watchos",
             deploymentTargets: .watchOS("10.0"),
             infoPlist: .extendingDefault(
