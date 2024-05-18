@@ -116,7 +116,7 @@ public class BluelockPeripheralDelegate: NSObject, CBPeripheralDelegate, Observa
             .filter { $0.uuid == .NordicUartServiceID }
             .first?
             .characteristics?
-            .filter { $0.uuid == .NordicUartCharaTxID }
+            .filter { $0.uuid == .NordicUartTxCharaID }
             .first
     }
     
@@ -163,18 +163,21 @@ public class BluelockPeripheralDelegate: NSObject, CBPeripheralDelegate, Observa
     
     public func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: (any Error)?) {
         for service in peripheral.services ?? [] {
-            if service.uuid == .NordicUartServiceID {
-                peripheral.discoverCharacteristics([.NordicUartCharaTxID, .NordicUartCharaRxID], for: service)
+            switch service.uuid {
+            case .NordicUartServiceID:
+                peripheral.discoverCharacteristics([.NordicUartTxCharaID, .NordicUartRxCharaID], for: service)
+                continue
+            default: continue
             }
         }
     }
     
     public func peripheral(_ peripheral: CBPeripheral, didDiscoverDescriptorsFor characteristic: CBCharacteristic, error: (any Error)?) {
         switch characteristic.uuid {
-        case .NordicUartCharaTxID:
+        case .NordicUartTxCharaID:
             peripheral.writeValue("s".data(using: .utf8)!, for: characteristic, type: .withResponse)
             break;
-        case .NordicUartCharaRxID:
+        case .NordicUartRxCharaID:
             peripheral.setNotifyValue(true, for: characteristic)
             break;
         default:
@@ -183,7 +186,7 @@ public class BluelockPeripheralDelegate: NSObject, CBPeripheralDelegate, Observa
     }
     
     public func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: (any Error)?) {
-        if characteristic.uuid == .NordicUartCharaRxID && characteristic.value != nil {
+        if characteristic.uuid == .NordicUartRxCharaID && characteristic.value != nil {
             peripheral.readRSSI()
             
             guard let repState = try? JSONDecoder().decode(DeviceReportedState.self, from: characteristic.value!) else {
