@@ -17,7 +17,7 @@ public class BluelockPeripheralDelegate: NSObject, CBPeripheralDelegate, Observa
     //    let engine: CHHapticEngine
     
     @Published var rssi: Float
-    @Published var txPower: Float
+    @Published var txPower: Float = 0
     @Published var lastUpdated: ContinuousClock.Instant?
     @Published var lastActuated: ContinuousClock.Instant?
     @Published var lockState: DeviceReportedState?
@@ -29,10 +29,19 @@ public class BluelockPeripheralDelegate: NSObject, CBPeripheralDelegate, Observa
     var peripheral: CBPeripheral
     var config: DeviceConfiguration?
     
-    init(peripheral: CBPeripheral, rssi: Float, txPower: Float) {
+    init(peripheral: CBPeripheral, rssi: Float?, txPower: Float?) {
         self.peripheral = peripheral
-        self.txPower = txPower
-        self.rssi = rssi
+
+        if let txPower = txPower {
+            self.txPower = txPower
+        } else {
+            peripheral.discoverServices([.BLETxPowerServiceID])
+        }
+
+        self.rssi = rssi ?? -128
+        if rssi == nil {
+            peripheral.readRSSI()
+        }
         
 #if canImport(ActivityKit)
         self.activity = Activity<LockAttributes>.activities.filter { $0.attributes.peer == peripheral.identifier }.first
@@ -40,6 +49,10 @@ public class BluelockPeripheralDelegate: NSObject, CBPeripheralDelegate, Observa
         
         //        engine = try! CHHapticEngine()
         //        try! engine.start()
+    }
+    
+    convenience init(peripheral: CBPeripheral) {
+        self.init(peripheral: peripheral, rssi: nil, txPower: nil)
     }
     
     public func setState(_ peripheral: CBPeripheral, locked: Bool) {
