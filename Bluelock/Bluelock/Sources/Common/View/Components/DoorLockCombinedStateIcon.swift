@@ -16,16 +16,18 @@ struct DoorLockCombinedStateIcon: View {
     var body: some View {
         HStack {
             if compact {
-                ZStack(alignment: .center) {
-                    DoorStateItem(withText: false, state: state)
-                        .foregroundStyle(.secondary)
-                    if state.closed {
-                        LockStateItem(withText: false, state: state, linkQuality: linkQuality)
-                            .foregroundStyle(Color.accentColor)
-                            .scaleEffect(0.75)
-                            .padding(.leading, 16)
+                DoorStateItem(withText: false, state: state)
+                    .foregroundStyle(.secondary)
+                    .overlay(alignment: .leading) {
+                        if state.closed {
+                            LockStateItem(withText: false, state: state, linkQuality: linkQuality)
+                                .foregroundStyle(Color.accentColor)
+                                .scaleEffect(0.75)
+                                .padding(.leading, 6)
+                        }
                     }
-                }
+                    .padding(.leading, 5)
+                    .padding(.trailing, 10)
             } else {
                 DoorStateItem(withText: false, state: state)
                     .foregroundStyle(.secondary)
@@ -56,7 +58,21 @@ struct DoorLockCombinedStateIcon: View {
             Spacer()
         }
         Spacer()
-        DoorLockCombinedStateIcon(state: DeviceReportedState(locked: true, closed: false, disengaged: true))
+        HStack {
+            Spacer()
+            DoorLockCombinedStateIcon(state: DeviceReportedState(locked: true, closed: false, disengaged: true))
+            Spacer()
+            DoorLockCombinedStateIcon(state: DeviceReportedState(locked: false, closed: false, disengaged: true))
+            Spacer()
+        }
+        Spacer()
+        HStack {
+            Spacer()
+            DoorLockCombinedStateIcon(state: DeviceReportedState(locked: true, closed: false, disengaged: false))
+            Spacer()
+            DoorLockCombinedStateIcon(state: DeviceReportedState(locked: false, closed: false, disengaged: false))
+            Spacer()
+        }
         Spacer()
     }
 }
