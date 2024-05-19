@@ -17,10 +17,9 @@ struct ConnectionIcon: View {
                 .symbolRenderingMode(.hierarchical)
                 .symbolEffect(.variableColor, isActive: !isConnected)
                 .foregroundStyle(isConnected ? Color.green : Color.secondary)
-        }
-        if isConnected {
+        } else if isConnected {
             Image(systemName: "link")
-                .foregroundStyle(Color.accentColor)
+                .foregroundStyle(Color.blue)
         }
     }
 }

@@ -26,7 +26,10 @@ struct DevicesView: View {
                                     HStack {
                                         Text(periph.peripheral.name ?? "Unknown Device")
                                         Spacer()
-                                        ConnectionIcon(isConnected: periph.peripheral.state == .connected)
+                                        ConnectionIcon(
+                                            isAutoConnect: BluelockDb.main.retrieve(peripheral: periph.peripheral)?.autoconnect,
+                                            isConnected: periph.peripheral.state == .connected
+                                        )
                                         if periph.peripheral.state == .connected {
                                             LinkQualityIcon(rssi: periph.rssi, txPower: periph.txPower)
                                         } else {
