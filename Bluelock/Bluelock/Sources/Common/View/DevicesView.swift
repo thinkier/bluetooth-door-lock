@@ -12,15 +12,16 @@ import CoreBluetooth
 struct DevicesView: View {
     @ObservedObject var blueCentral: BluelockCentralDelegate
     @State var update: Cancellable?
+    @State var knownPeriphs: [BluelockPeripheralDelegate] = []
     @State var bestPeriphs: [ScannedPeripheral] = []
     
     var body: some View {
         NavigationStack {
             VStack {
                 List {
-                    if !blueCentral.peripherals.isEmpty {
+                    if !knownPeriphs.isEmpty {
                         Section("Known Devices") {
-                            ForEach(blueCentral.peripherals.values.shuffled(), id: \.peripheral.identifier) { periph in
+                            ForEach(knownPeriphs, id: \.peripheral.identifier) { periph in
                                 NavigationLink(value: periph.peripheral) {
                                     HStack {
                                         Text(periph.peripheral.name ?? "Unknown Device")
@@ -58,8 +59,15 @@ struct DevicesView: View {
             .onAppear {
                 self.update?.cancel()
                 self.update = DispatchQueue.main.schedule(after: .init(.now()), interval: .init(.milliseconds(100))) {
+                    knownPeriphs = blueCentral.peripherals
+                        .filter({ BluelockDb.main.retrieve(id: $0.key) != nil })
+                        .map { $0.value }
                     let bestPeriphs = blueCentral.getBestPeripherals()
-                        .filter { blueCentral.peripherals[$0.peripheral.identifier] == nil }
+                        .filter { scanned in
+                            !knownPeriphs.contains(where: { known in
+                                scanned.peripheral.identifier == known.peripheral.identifier
+                            })
+                        }
                     self.bestPeriphs = bestPeriphs
                 }
             }
