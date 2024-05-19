@@ -25,8 +25,8 @@ BLETps bletps(TX_POWER);
 
 Adafruit_PWMServoDriver servo = Adafruit_PWMServoDriver();
 
-const uint8_t bluelockUuid[] = {0x1C, 0xDC, 0x15, 0xE1, 0x36, 0x6D, 0x2C, 0x98, 0x97, 0x75, 0x2F, 0x01, 0x01, 0xE1, 0x8E, 0x01};
-BLEUuid bluelockId = BLEUuid(bluelockUuid);
+// org.bluetooth.service.binary_sensor
+BLEUuid bluelockId = BLEUuid(0x183B);
 
 void setup()
 {
@@ -60,16 +60,17 @@ void setup()
 
 void startAdv(void)
 {
+  Bluefruit.setName("Smart Lock");
+  Bluefruit.setAppearance(BLE_APPEARANCE_GENERIC_KEYRING);
+
   // Advertising packet
   Bluefruit.Advertising.addFlags(BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE);
+  Bluefruit.Advertising.addName();
   Bluefruit.Advertising.addTxPower();
   Bluefruit.Advertising.addUuid(bluelockId);
+  Bluefruit.Advertising.addUuid(UUID16_SVC_TX_POWER);
+  Bluefruit.Advertising.addAppearance(BLE_APPEARANCE_GENERIC_KEYRING);
 
-  // Secondary Scan Response packet (optional)
-  // Since there is no room for 'Name' in Advertising packet
-  Bluefruit.setName("Smart Lock");
-  Bluefruit.ScanResponse.addName();
-  
   /* Start Advertising
    * - Enable auto advertising if disconnected
    * - Interval:  fast mode = 20 ms, slow mode = 152.5 ms
