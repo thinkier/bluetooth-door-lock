@@ -45,7 +45,7 @@ public class BluelockCentralDelegate: NSObject, CBCentralManagerDelegate, Observ
                 .map {
                     BluelockPeripheralDelegate(peripheral: peripheral, rssi: $0.rssi, txPower: $0.txPowerLevel)
                 }
-            ?? BluelockPeripheralDelegate(peripheral: peripheral, rssi: -128, txPower: 4)
+            ?? BluelockPeripheralDelegate(peripheral: peripheral, rssi: -128, txPower: 0)
             peripherals.updateValue(lock, forKey: peripheral.identifier)
         }
         
