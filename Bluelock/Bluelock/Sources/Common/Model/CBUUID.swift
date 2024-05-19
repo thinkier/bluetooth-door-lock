@@ -9,8 +9,10 @@ import Foundation
 import CoreBluetooth
 
 extension CBUUID {
-    /// Bluelock Custom Service
-    public static let BluelockServiceID = CBUUID.init(string: "018EE101-012F-7597-982C-6D36E115DC1C");
+    /// Bluelock Advertised Service
+    public static let BluelockServiceID = CBUUID.init(string: "183B");
+    /// Standards-conforming BLE Battery Service ID
+    public static let BLEBatteryServiceID = CBUUID.init(string: "180F");
     /// Standards-conforming BLE TX Power Service ID
     public static let BLETxPowerServiceID = CBUUID.init(string: "1804");
     /// Standards-conforming BLE TX Power Level Characteristic ID
