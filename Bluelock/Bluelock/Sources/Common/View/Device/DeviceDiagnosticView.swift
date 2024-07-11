@@ -5,21 +5,21 @@
 //  Created by Matthew on 13/4/2024.
 //
 
-import SwiftUI
-import CoreBluetooth
 import Combine
+import CoreBluetooth
+import SwiftUI
 
 struct DeviceDiagnosticView: View {
     var peripheral: CBPeripheral
-    
+
     @Binding var config: DeviceConfiguration
     @ObservedObject var currentLock: BluelockPeripheralDelegate
     @Binding var scanned: ScannedPeripheral?
     @Binding var wantsConnection: Bool
-    
+
     @State var isInRange: Bool = false
     @State var update: Cancellable?
-    
+
     var body: some View {
         Section("Diagnostic") {
             HStack {

@@ -5,16 +5,16 @@
 //  Created by Matthew on 8/4/2024.
 //
 
-import SwiftUI
 import Combine
 import CoreBluetooth
+import SwiftUI
 
 struct DevicesView: View {
     @ObservedObject var blueCentral: BluelockCentralDelegate
     @State var update: Cancellable?
     @State var knownPeriphs: [BluelockPeripheralDelegate] = []
     @State var bestPeriphs: [ScannedPeripheral] = []
-    
+
     var body: some View {
         NavigationStack {
             VStack {
@@ -48,7 +48,7 @@ struct DevicesView: View {
                         }
                     }
                 }
-                
+
                 if bestPeriphs.isEmpty {
                     VStack {
                         Text("No Nearby Devices Found")
@@ -63,7 +63,7 @@ struct DevicesView: View {
                 self.update?.cancel()
                 self.update = DispatchQueue.main.schedule(after: .init(.now()), interval: .init(.milliseconds(100))) {
                     knownPeriphs = blueCentral.peripherals
-                        .filter({ BluelockDb.main.retrieve(id: $0.key) != nil })
+                        .filter { BluelockDb.main.retrieve(id: $0.key) != nil }
                         .map { $0.value }
                     let bestPeriphs = blueCentral.getBestPeripherals()
                         .filter { scanned in

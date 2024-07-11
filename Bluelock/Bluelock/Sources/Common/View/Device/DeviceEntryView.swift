@@ -10,7 +10,7 @@ import SwiftUI
 struct DeviceEntryView: View {
     @ObservedObject var blueCentral: BluelockCentralDelegate
     var scanned: ScannedPeripheral
-    
+
     var body: some View {
         NavigationLink(value: scanned.peripheral) {
             HStack {

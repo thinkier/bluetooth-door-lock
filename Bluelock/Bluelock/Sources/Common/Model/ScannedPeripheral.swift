@@ -5,8 +5,8 @@
 //  Created by Matthew on 9/4/2024.
 //
 
-import Foundation
 import CoreBluetooth
+import Foundation
 
 public struct ScannedPeripheral: Hashable {
     /// Name supplied by the peripheral's broadcasts
@@ -21,7 +21,7 @@ public struct ScannedPeripheral: Hashable {
     public var date: Date
     /// Handle to connect to
     public var peripheral: CBPeripheral
-    
+
     public func linkQuality() -> LinkQuality {
         LinkQuality(distance: distance)
     }

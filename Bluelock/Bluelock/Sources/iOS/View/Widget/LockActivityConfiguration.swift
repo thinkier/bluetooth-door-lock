@@ -7,10 +7,9 @@
 //
 
 import ActivityKit
-import WidgetKit
-import SwiftUI
 import CoreBluetooth
-
+import SwiftUI
+import WidgetKit
 
 struct LockActivityConfiguration: Widget {
     var body: some WidgetConfiguration {
@@ -22,7 +21,7 @@ struct LockActivityConfiguration: Widget {
                         state: context.state.lockState!,
                         linkQuality: context.state.linkQuality
                     )
-                        .padding(.leading, 10)
+                    .padding(.leading, 10)
                 }
                 Text(context.attributes.name)
                 Spacer()
@@ -44,7 +43,7 @@ struct LockActivityConfiguration: Widget {
                             .padding(.leading, 10)
                         }
                     }
-                    DynamicIslandExpandedRegion(.center){
+                    DynamicIslandExpandedRegion(.center) {
                         Text(context.attributes.name)
                     }
                     DynamicIslandExpandedRegion(.trailing) {
@@ -55,17 +54,16 @@ struct LockActivityConfiguration: Widget {
                     }
                 },
                 compactLeading: {
-                    if context.state.linkQuality != .none && context.state.lockState != nil {
+                    if context.state.linkQuality != .none, context.state.lockState != nil {
                         DoorLockCombinedStateIcon(
                             state: context.state.lockState!,
                             linkQuality: context.state.linkQuality
                         )
                     }
                 },
-                compactTrailing: {
-                },
+                compactTrailing: {},
                 minimal: {
-                    if context.state.linkQuality != .none && context.state.lockState != nil {
+                    if context.state.linkQuality != .none, context.state.lockState != nil {
                         DoorLockCombinedStateIcon(
                             state: context.state.lockState!,
                             linkQuality: context.state.linkQuality
@@ -75,7 +73,7 @@ struct LockActivityConfiguration: Widget {
             )
         }
     }
-    
+
     public func create(peripheral: CBPeripheral, lockState: DeviceReportedState, linkQuality: LinkQuality) -> Activity<LockAttributes>? {
         if ActivityAuthorizationInfo().areActivitiesEnabled {
             do {
@@ -83,7 +81,7 @@ struct LockActivityConfiguration: Widget {
                 let initialState = LockAttributes.ContentState(
                     lockState: lockState, linkQuality: linkQuality
                 )
-                
+
                 return try Activity.request(
                     attributes: lock,
                     content: .init(state: initialState, staleDate: nil)
@@ -92,7 +90,7 @@ struct LockActivityConfiguration: Widget {
                 print(error)
             }
         }
-        
+
         return nil
     }
 }

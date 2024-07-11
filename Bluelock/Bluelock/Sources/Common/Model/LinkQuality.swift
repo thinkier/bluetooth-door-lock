@@ -16,7 +16,7 @@ public enum LinkQuality: Codable & Hashable & Comparable {
     case bad
     /// Out of range
     case none
-    
+
     public init(distance: Float) {
         if distance <= 1 {
             self = .great
@@ -28,7 +28,7 @@ public enum LinkQuality: Codable & Hashable & Comparable {
             self = .none
         }
     }
-    
+
     public func color() -> Color {
         switch self {
         case .great:
@@ -41,21 +41,21 @@ public enum LinkQuality: Codable & Hashable & Comparable {
             return .secondary
         }
     }
-    
+
     public func score() -> Double {
         switch self {
         case .great:
             return 1
         case .good:
-            return 2/3
+            return 2 / 3
         case .bad:
-            return 1/3
+            return 1 / 3
         default:
             return 0
         }
     }
-    
-    static public func < (lhs: Self, rhs: Self) -> Bool {
+
+    public static func < (lhs: Self, rhs: Self) -> Bool {
         return rhs.score() < lhs.score()
     }
 }

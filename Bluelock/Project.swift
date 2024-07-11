@@ -5,7 +5,7 @@ let project = Project(
     organizationName: "thinkier.github.io",
     options: .options(xcodeProjectName: "Bluelock"),
     packages: [
-        .remote(url: "https://github.com/stephencelis/SQLite.swift", requirement: .upToNextMajor(from: "0.15"))
+        .remote(url: "https://github.com/stephencelis/SQLite.swift", requirement: .upToNextMajor(from: "0.15")),
     ],
     settings: .settings(base: SettingsDictionary()
         .automaticCodeSigning(devTeam: "6X8VAXGXBX")
@@ -26,7 +26,7 @@ let project = Project(
                     "NSSupportsLiveActivities": true,
                     "UIBackgroundModes": ["bluetooth-central"],
                     "UIFileSharingEnabled": true,
-                    "LSSupportsOpeningDocumentsInPlace": true
+                    "LSSupportsOpeningDocumentsInPlace": true,
                 ]
             ),
             sources: ["Bluelock/Sources/Common/**", "Bluelock/Sources/iOS/**", "Bluelock/Sources/App/**"],
@@ -43,8 +43,8 @@ let project = Project(
             infoPlist: .extendingDefault(
                 with: [
                     "NSExtension": [
-                        "NSExtensionPointIdentifier": "com.apple.widgetkit-extension"
-                    ]
+                        "NSExtensionPointIdentifier": "com.apple.widgetkit-extension",
+                    ],
                 ]
             ),
             sources: ["Bluelock/Sources/Common/**", "Bluelock/Sources/iOS/**", "Bluelock/Sources/Widgets/**"],
@@ -67,13 +67,13 @@ let project = Project(
                     "WKCompanionAppBundleIdentifier": "io.github.thinkier.Bluelock",
                     "WKRunsIndependentlyOfCompanionApp": true,
                     "UIFileSharingEnabled": true,
-                    "LSSupportsOpeningDocumentsInPlace": true
+                    "LSSupportsOpeningDocumentsInPlace": true,
                 ]
             ),
             sources: ["Bluelock/Sources/Common/**", "Bluelock/Sources/watchOS/**", "Bluelock/Sources/App/**"],
             resources: ["Bluelock/Resources/Common/**"],
             entitlements: "Bluelock/Bluelock.entitlements",
             dependencies: [.package(product: "SQLite", type: .runtime)]
-        )
+        ),
     ]
 )

@@ -12,7 +12,7 @@ struct DoorLockCombinedStateIcon: View {
     var compact = true
     var state: DeviceReportedState
     var linkQuality = LinkQuality.great
-    
+
     var body: some View {
         HStack {
             if compact {

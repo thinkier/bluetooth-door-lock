@@ -1,82 +1,82 @@
 //
-//  BlueDelegate.swift
+//  BluelockCentralDelegate.swift
 //  Bluelock
 //
 //  Created by Matthew on 8/4/2024.
 //
 
-import Foundation
-import CoreBluetooth
 import Combine
+import CoreBluetooth
+import Foundation
 #if canImport(ActivityKit)
-import ActivityKit
+    import ActivityKit
 #endif
 
 public class BluelockCentralDelegate: NSObject, CBCentralManagerDelegate, ObservableObject {
     @Published var scanned: [ScannedPeripheral] = []
-    @Published var peripherals: [UUID : BluelockPeripheralDelegate] = [:]
-    
+    @Published var peripherals: [UUID: BluelockPeripheralDelegate] = [:]
+
     private var central: CBCentralManager?
     private var handles: [Cancellable] = []
-    
-    public override init() {
+
+    override public init() {
         super.init()
-        self.handles.append(DispatchQueue.main.schedule(after: .init(.now()), interval: .seconds(1), self.scanReduce))
-        self.central = CBCentralManager.init(delegate: self, queue: nil, options: [
+        handles.append(DispatchQueue.main.schedule(after: .init(.now()), interval: .seconds(1), scanReduce))
+        central = CBCentralManager(delegate: self, queue: nil, options: [
             CBCentralManagerOptionShowPowerAlertKey: true,
-            CBCentralManagerOptionRestoreIdentifierKey: "main"
+            CBCentralManagerOptionRestoreIdentifierKey: "main",
         ])
     }
-    
+
     deinit {
         central?.stopScan()
         handles.forEach { $0.cancel() }
     }
-    
+
     func scanReduce() {
-        self.scanned = self.scanned.filter({ periph in
-            return NSDate().timeIntervalSince(periph.date as Date) <= 2
-        });
+        scanned = scanned.filter { periph in
+            NSDate().timeIntervalSince(periph.date as Date) <= 2
+        }
     }
-    
+
     public func getPeripheralDelegate(_ peripheral: CBPeripheral) -> BluelockPeripheralDelegate {
         if peripherals[peripheral.identifier] == nil {
             let lock = getScannedPeripheral(peripheral.identifier)
                 .map {
                     BluelockPeripheralDelegate(peripheral: peripheral, rssi: $0.rssi, txPower: $0.txPowerLevel)
                 }
-            ?? BluelockPeripheralDelegate(peripheral: peripheral)
+                ?? BluelockPeripheralDelegate(peripheral: peripheral)
             peripherals.updateValue(lock, forKey: peripheral.identifier)
         }
-        
+
         return peripherals[peripheral.identifier]!
     }
-    
+
     public func connect(_ peripheral: CBPeripheral) {
         peripheral.delegate = getPeripheralDelegate(peripheral)
-        
-        self.central?.connect(peripheral)
+
+        central?.connect(peripheral)
     }
-    
+
     public func disconnect(_ peripheral: CBPeripheral) {
-        self.central?.cancelPeripheralConnection(peripheral)
+        central?.cancelPeripheralConnection(peripheral)
     }
-    
+
     public func getScannedPeripheral(_ identifier: UUID) -> ScannedPeripheral? {
-        self.getBestPeripherals().filter { scanned in
+        getBestPeripherals().filter { scanned in
             scanned.peripheral.identifier == identifier
         }.first
     }
-    
+
     public func getBestPeripherals() -> [ScannedPeripheral] {
         var reduced_buf: [UUID: ScannedPeripheral] = [:]
-        
-        for scanned in self.scanned {
-            let id = scanned.peripheral.identifier;
-            
+
+        for scanned in scanned {
+            let id = scanned.peripheral.identifier
+
             if reduced_buf.contains(where: { k, _ in id == k }) {
-                let buffered = reduced_buf[id]!;
-                
+                let buffered = reduced_buf[id]!
+
                 reduced_buf[id]!.name = buffered.name ?? scanned.name
                 reduced_buf[id]!.rssi = buffered.rssi < scanned.rssi ? scanned.rssi : buffered.rssi
                 reduced_buf[id]!.distance = buffered.distance < scanned.distance ? buffered.distance : scanned.distance
@@ -85,16 +85,16 @@ public class BluelockCentralDelegate: NSObject, CBCentralManagerDelegate, Observ
                 reduced_buf.updateValue(scanned, forKey: id)
             }
         }
-        
-        var sort_buf = reduced_buf.map({_, v in v})
-        sort_buf.sort(by: {a, b in a.distance < b.distance})
+
+        var sort_buf = reduced_buf.map { _, v in v }
+        sort_buf.sort(by: { a, b in a.distance < b.distance })
         return sort_buf
     }
-    
-    public func centralManager(_ central: CBCentralManager, willRestoreState _: [String : Any]) {
+
+    public func centralManager(_: CBCentralManager, willRestoreState _: [String: Any]) {
         // No additional handling required
     }
-    
+
     public func centralManagerDidUpdateState(_ central: CBCentralManager) {
         switch central.state {
         case .poweredOn:
@@ -110,7 +110,7 @@ public class BluelockCentralDelegate: NSObject, CBCentralManagerDelegate, Observ
         default:
             print("CBCentralManager State: Unknown")
         }
-        
+
         if central.state == .poweredOn {
             BluelockDb.main.retrieveAllBonded()
                 .map { id, conf in
@@ -128,62 +128,62 @@ public class BluelockCentralDelegate: NSObject, CBCentralManagerDelegate, Observ
             central.scanForPeripherals(withServices: [.BluelockServiceID], options: [CBCentralManagerScanOptionAllowDuplicatesKey: true])
         }
     }
-    
+
     @MainActor
-    public func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi: NSNumber) {
+    public func centralManager(_: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String: Any], rssi: NSNumber) {
         if rssi == 127 { return }
-        
+
         let ts: CFNumber = advertisementData["kCBAdvDataTimestamp"] as! CFNumber
-        let date = NSDate(timeIntervalSinceReferenceDate: Double(truncating: ts));
+        let date = NSDate(timeIntervalSinceReferenceDate: Double(truncating: ts))
         let name: CFString? = advertisementData["kCBAdvDataLocalName"] as! CFString?
         let txPower = Float(truncating: advertisementData["kCBAdvDataTxPowerLevel"] as! CFNumber? ?? 8)
         let dist = estimateDistance(rssi: rssi.floatValue, txPower: txPower)
-        
+
         if BluelockDb.main.retrieve(peripheral: peripheral) != nil {
             let delegate = getPeripheralDelegate(peripheral)
             delegate.txPower = txPower
         }
-        
+
         if dist < 10000 {
-            self.scanned.append(ScannedPeripheral(name: name as String?, rssi: Float(truncating: rssi), txPowerLevel: txPower, distance: dist, date: date as Date, peripheral: peripheral))
-            
+            scanned.append(ScannedPeripheral(name: name as String?, rssi: Float(truncating: rssi), txPowerLevel: txPower, distance: dist, date: date as Date, peripheral: peripheral))
+
             if peripheral.state == .disconnected && BluelockDb.main.retrieve(peripheral: peripheral)?.autoconnect == true {
                 connect(peripheral)
             }
         }
-        
+
         #if canImport(ActivityKit)
-        let del = getPeripheralDelegate(peripheral)
-        del.updateToUser(lockState: del.lockState, linkQuality: LinkQuality(distance: dist))
+            let del = getPeripheralDelegate(peripheral)
+            del.updateToUser(lockState: del.lockState, linkQuality: LinkQuality(distance: dist))
         #endif
     }
-    
+
     @MainActor
-    public func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
+    public func centralManager(_: CBCentralManager, didConnect peripheral: CBPeripheral) {
         peripheral.discoverServices([.NordicUartServiceID, .BluelockServiceID, .BLETxPowerServiceID, .BLEBatteryServiceID])
     }
-    
+
     @MainActor
-    public func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: (any Error)?) {
+    public func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error _: (any Error)?) {
         handleDisconnect(central, peripheral: peripheral)
     }
-    
-    public func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: (any Error)?) {
+
+    public func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error _: (any Error)?) {
         handleDisconnect(central, peripheral: peripheral)
     }
-    
+
     @MainActor
-    public func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, timestamp: CFAbsoluteTime, isReconnecting: Bool, error: (any Error)?) {
+    public func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, timestamp _: CFAbsoluteTime, isReconnecting _: Bool, error _: (any Error)?) {
         handleDisconnect(central, peripheral: peripheral)
     }
-    
+
     public func handleDisconnect(_ central: CBCentralManager, peripheral: CBPeripheral) {
         if let conf = BluelockDb.main.retrieve(peripheral: peripheral) {
             if conf.autoconnect {
                 central.connect(peripheral)
             } else {
                 #if canImport(ActivityKit)
-                // getPeripheralDelegate(peripheral).activity?.end()
+                    // getPeripheralDelegate(peripheral).activity?.end()
                 #endif
             }
         }

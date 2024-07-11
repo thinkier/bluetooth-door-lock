@@ -10,7 +10,7 @@ import SwiftUI
 struct DoorStateItem: View {
     var withText: Bool = true
     var state: DeviceReportedState?
-    
+
     var body: some View {
         if state?.closed == true {
             if withText {
@@ -26,7 +26,7 @@ struct DoorStateItem: View {
                 .symbolRenderingMode(.hierarchical)
         }
     }
-    
+
     func getIconName() -> String {
         if state?.closed == true {
             "door.left.hand.closed"

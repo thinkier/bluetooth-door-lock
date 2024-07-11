@@ -1,5 +1,5 @@
 //
-//  LockReportedState.swift
+//  DeviceReportedState.swift
 //  Bluelock
 //
 //  Created by Matthew on 11/4/2024.

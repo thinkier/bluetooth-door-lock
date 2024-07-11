@@ -7,9 +7,9 @@
 
 import SwiftUI
 
-extension Image {
-    public func icon() -> some View {
-        self.scaleEffect(1.5)
+public extension Image {
+    func icon() -> some View {
+        scaleEffect(1.5)
             .padding(.leading, 6)
             .padding(.trailing, 10)
             .symbolRenderingMode(.hierarchical)

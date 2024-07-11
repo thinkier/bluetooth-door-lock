@@ -5,22 +5,22 @@
 //  Created by Matthew on 10/4/2024.
 //
 
-import SwiftUI
-import CoreBluetooth
 import Combine
+import CoreBluetooth
+import SwiftUI
 
 struct DeviceView: View {
     @ObservedObject var blueCentral: BluelockCentralDelegate
-    
+
     var peripheral: CBPeripheral
     var currentLock: BluelockPeripheralDelegate
-    
+
     @State var update: Cancellable?
     @State var scanned: ScannedPeripheral?
     @State var wantsConnection: Bool = false
-    
+
     @State var config = DeviceConfiguration()
-    
+
     var body: some View {
         VStack {
             List {
@@ -33,11 +33,11 @@ struct DeviceView: View {
             if let config = BluelockDb.main.retrieve(peripheral: peripheral) {
                 self.config = config
             }
-            
+
             self.update?.cancel()
             self.update = DispatchQueue.main.schedule(after: .init(.now()), interval: .init(.milliseconds(100))) {
                 scanned = blueCentral.getScannedPeripheral(peripheral.identifier)
-                
+
                 if wantsConnection {
                     if peripheral.state == .disconnected && !config.autoconnect {
                         wantsConnection = false

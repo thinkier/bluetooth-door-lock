@@ -15,7 +15,7 @@ struct LockAttributes: ActivityAttributes {
         let linkQuality: LinkQuality
         var lastUpdated = Date.now
     }
-    
+
     let peer: UUID
     let name: String
 }
