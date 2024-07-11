@@ -8,7 +8,7 @@
 import SwiftUI
 
 public enum LinkQuality: Codable & Hashable & Comparable {
-    /// Less than 1.25mm from the transmitter
+    /// Less than 1m from the transmitter
     case great
     /// Less than 8m from the transmitter
     case good
@@ -18,7 +18,7 @@ public enum LinkQuality: Codable & Hashable & Comparable {
     case none
     
     public init(distance: Float) {
-        if distance <= 1.25 {
+        if distance <= 1 {
             self = .great
         } else if distance <= 8 {
             self = .good
