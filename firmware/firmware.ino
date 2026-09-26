@@ -7,12 +7,12 @@
 #include <Adafruit_PWMServoDriver.h>
 #include "BLETps.h"
 
-#define LOCKED  1575
-#define UNLOCKED  2300
+#define LOCKED  1050
+#define UNLOCKED  1600
 #define SERVO_FREQ 50
 #define SERVO_NUM 0
 
-#define SERVO_LOCKED_THRESHOLD 410
+#define SERVO_LOCKED_THRESHOLD 285
 
 #define TX_POWER -12
 
