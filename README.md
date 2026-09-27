@@ -13,4 +13,4 @@ I would've done the following differently:
 - CoreBluetooth implementation is a mess -- Use [AsyncCoreBluetooth](https://GitHub.com/meech-ward/AsyncCoreBluetooth)?
 - Use GATT attributes for lock / closed instead of a haphazardly hacked together serial port
 - (Physical) Use more secure mounting and fastening options on a custom PCB
-- Prevent snooping from other iOS apps w/ [`AccessorySetupKit`](https://developer.apple.com/documentation/accessorysetupkit) so it's E2E secure and security isn't terminated by iOS's Bluetooth stack and allowing any apps on a bonded to use it. This gets theoretical quickly. https://xkcd.com/538) -- I'm securing a wooden door with a physical key hole that can literally be picked in a minute.
+- Prevent snooping from other iOS apps w/ [`AccessorySetupKit`](https://developer.apple.com/documentation/accessorysetupkit) so it's E2E secure and security isn't terminated by iOS's Bluetooth stack and allowing any apps on a bonded to use it. (This gets theoretical quickly. https://xkcd.com/538 -- I'm securing a wooden door with a physical key hole that can literally be picked in a minute.)
