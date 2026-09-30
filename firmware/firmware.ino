@@ -7,12 +7,12 @@
 #include <Adafruit_PWMServoDriver.h>
 #include "BLETps.h"
 
-#define LOCKED  1050
-#define UNLOCKED  1600
+#define LOCKED  650
+#define UNLOCKED  1000
 #define SERVO_FREQ 50
 #define SERVO_NUM 0
 
-#define SERVO_LOCKED_THRESHOLD 285
+#define SERVO_LOCKED_THRESHOLD 200
 
 #define TX_POWER -12
 
@@ -30,6 +30,7 @@ BLEUuid bluelockId = BLEUuid(0x183B);
 
 void setup()
 {
+  //Serial.begin(115200);
   pinMode(SERVO_FEEDBACK, INPUT);
   pinMode(HALL_SENSOR, INPUT_PULLUP);
   servo.begin();
@@ -94,7 +95,7 @@ unsigned long ULONG_MAX = 4294967295;
 
 void loop()
 {
-  if (analogRead(SERVO_FEEDBACK) < SERVO_LOCKED_THRESHOLD != locked) {
+  if (servo_is_locked() != locked) {
     locked = !locked;
     status_time = ULONG_MAX;
   }
@@ -134,6 +135,13 @@ void loop()
         bleuart.write("Send <d> to disengage the servo, <u> to unlock, <l> to lock.");
     }
   }
+}
+
+bool servo_is_locked() {
+  uint32_t feedback = analogRead(SERVO_FEEDBACK);
+  //Serial.print("Servo: ");
+  //Serial.println(feedback);
+  return feedback < SERVO_LOCKED_THRESHOLD;
 }
 
 void servo_lock() {
